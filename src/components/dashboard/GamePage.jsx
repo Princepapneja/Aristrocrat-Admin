@@ -17,7 +17,7 @@ import { ChevronUp } from "lucide-react";
 function GamePage() {
   const [params] = useSearchParams()
   const studio = params.get("studio")
-  // console.log(studio)
+  // //console.log(studio)
   const [filters, setFilters] = useState({ skip: 0, limit: 12, studio: studio || "" });
   const [games, setGames] = useState([]);
   const [hasMore, setHasMore] = useState(true);
@@ -105,10 +105,10 @@ const [hoveredCardIndex, setHoveredCardIndex] = useState(null);
     setLoading(true);
     try {
       const queryParams = new URLSearchParams(filters).toString();
-      console.log(queryParams);
+      //console.log(queryParams);
       
       const { data } = await apiHandler.get(`games?${queryParams}`);
-      console.log(data);
+      //console.log(data);
       
       const newGames = data.data.games || [];
       setGames((prev) => (filters.skip === 0 ? newGames : [...prev, ...newGames]));
@@ -120,7 +120,7 @@ const [hoveredCardIndex, setHoveredCardIndex] = useState(null);
     setLoading(false);
   };
 
-  // console.log(games);
+  // //console.log(games);
   
   const onFilterChange = (e) => {
     debugger
@@ -155,10 +155,10 @@ const [hoveredCardIndex, setHoveredCardIndex] = useState(null);
   const fetchStudio = async () => {
     try {
       const { data } = await apiHandler.get(`studios`);
-      // console.log(data);
+      // //console.log(data);
 
       const newstudio = data?.data || [];
-      console.log(newstudio);
+      //console.log(newstudio);
       setStudioName(newstudio)
 
       // setGames((prev) => (filters.skip === 0 ? newGames : [...prev, ...newGames]));

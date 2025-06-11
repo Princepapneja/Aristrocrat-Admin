@@ -14,7 +14,7 @@ const DashboardLayout = () => {
 
   const fetchDetails = async () => {
     const { data } = await apiHandler.get("me")
-    console.log(data);
+    //console.log(data);
     
     if (data?.data?.access === "blocked") {
       localStorage.removeItem("token")
@@ -50,7 +50,7 @@ const DashboardLayout = () => {
 
 
   const location = useLocation();
-  console.log(location);
+  //console.log(location);
   
   const pathSegments = location.pathname.split('/').filter(Boolean);
   

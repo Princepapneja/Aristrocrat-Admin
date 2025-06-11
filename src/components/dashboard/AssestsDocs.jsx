@@ -21,18 +21,18 @@ function AssestsDocs() {
     try {
       const { data } = await apiHandler.get(`/companies`);
 
-    //   console.log(data);
+    //   //console.log(data);
       setCompanyList(data.data)
       
 //       const newSubstudio = data?.data?.map((e) => {
-//         console.log(e);
+//         //console.log(e);
         
 //         return {
 //           name: e?.name,
 //           value: e?.id
 //         }
 //       }) || [];
-// // console.log(newSubstudio);
+// // //console.log(newSubstudio);
 
 //       setCompanyList([
 //         {

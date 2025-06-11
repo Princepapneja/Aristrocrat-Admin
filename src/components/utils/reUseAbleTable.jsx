@@ -119,7 +119,7 @@ function ReUseAbleTable({ loader = true, buttons, data, cols, handleRow, fetchDa
         setTotalPage(count === 0 ? 1 : count)
       }
   } catch (error) {
-    console.log(error);
+    //console.log(error);
   }
     loader &&
       setTimeout(() => {

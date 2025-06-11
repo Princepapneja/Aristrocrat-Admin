@@ -21,7 +21,7 @@ function ContactUs() {
             [e.target.id]: e.target.value
         }
         setInputDetails(a)
-        console.log(a)
+        //console.log(a)
     }
 
     const [inputs, setInputs] = useState(

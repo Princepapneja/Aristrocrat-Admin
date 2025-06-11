@@ -26,7 +26,7 @@ const GameUploadForm = () => {
   const [availablefor, setAvailableFor] = useState(false)
   const [partners, setPartners] = useState([{ partner: "" }]);
   const param = useParams();
-  // console.log(param);
+  // //console.log(param);
 const [countries ,setCountries]=useState([])
 
 
@@ -69,15 +69,28 @@ const [variationRows, setVariationRows] = useState(1);
   ]);
 
  const handleChange = (index, field, value) => {
+ 
+
+  
   const updatedDates = [...dates];
   updatedDates[index][field] = value;
-  console.log( updatedDates[index][field] = value);
+  //console.log( updatedDates);
   
   setDates(updatedDates);
 
+ const regionalReleaseDates = updatedDates.reduce((acc, item) => {
+  
+    if (item.id && item.date) {
+      acc[item.id] = new Date(item.date).toISOString();
+    }
+    return acc;
+  }, {});
+
+  //console.log(regionalReleaseDates);
+  
   setFormData((prev) => ({
     ...prev,
-    regionalReleaseDates: updatedDates,
+    regionalReleaseDates
   }));
 };
 
@@ -97,7 +110,7 @@ const [variationRows, setVariationRows] = useState(1);
   const fetchSubStudios = async () => {
     try {
       const { data } = await apiHandler.get(`sub-studios/${param?.id}`);
-      console.log(data);
+      //console.log(data);
       
 
       const newSubstudio = data?.data?.map((e) => {
@@ -106,7 +119,7 @@ const [variationRows, setVariationRows] = useState(1);
           value: e?.id
         }
       }) || [];
-// console.log(newSubstudio);
+// //console.log(newSubstudio);
 
       setSubStudios([
         {
@@ -128,7 +141,7 @@ const [variationRows, setVariationRows] = useState(1);
   const fetchRegions = async () => {
     try {
       const { data } = await apiHandler.get(`/regions`);
-      console.log(data);
+      //console.log(data);
       setCountries(data?.data)
 
       
@@ -167,7 +180,7 @@ const [variationRows, setVariationRows] = useState(1);
     }
   };
 
-  // console.log(formData);
+  // //console.log(formData);
 
 
   useEffect(() => {
@@ -206,7 +219,7 @@ const handleNextClick = async (e) => {
   e.preventDefault();
 
   const result = await handleSubmit(e, "draft");
-console.log(result);
+//console.log(result);
 const data =result?.successData
 
  
@@ -236,14 +249,14 @@ const data =result?.successData
       status, 
     };
 
-    console.log(finalData);
+    //console.log(finalData);
     
       const { data } = await apiHandler.post("/games", finalData)
       success(data?.message)
-      console.log(data.data);
+      //console.log(data.data);
       
       return { successData: data.data };
-      // console.log(data);
+      // //console.log(data);
 
       // setRender(!render)
     } catch (err) {
@@ -266,7 +279,7 @@ const data =result?.successData
     } else {
       data.push(value)
     }
-    // console.log(data);
+    // //console.log(data);
 
     setFormData((prev => ({ ...prev, categoryIds: data })))
   }
@@ -277,7 +290,7 @@ const data =result?.successData
 //   const fetchGameData = async () => {
 //     try {
 //       const { data } = await apiHandler.get(`/games`);
-//       console.log(data?.data?.games[0]);
+//       //console.log(data?.data?.games[0]);
       
     
 //       setFormData({
@@ -300,7 +313,6 @@ const data =result?.successData
 //   fetchGameData();
 // }, []);
 
-console.log(formData);
 
 
   return (
@@ -454,7 +466,7 @@ console.log(formData);
 
       <div className="flex justify-between gap-2 mt-10">
 
-        <Studio className="w-full" label='Features' options={feature} showBtn={true} onChange={handleCategories} />
+        <Studio className="w-full" label='Features' options={feature} showBtn={true} onChange={handleCategories} name="Feature" />
 
         <Studio className="w-full" label='Game Type' showBtn={true} options={gameType} onChange={handleCategories} name="GametypeId" />
         <Studio className="w-full" label='Theme' showBtn={true} options={theme} onChange={handleCategories} name="ThemeId" />

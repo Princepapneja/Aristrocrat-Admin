@@ -35,10 +35,10 @@ const AristocratInterPublish = () => {
   const [addExclusivity, setAddExclusivity] = useState(false);
 const [companyList,setCompanyList]=useState([])
 const [companyIds,setCompanyIds]=useState(null)
-    console.log(gameFile);
+    //console.log(gameFile);
     
     const handleFileChange = async (e) => {
-        console.log();
+        //console.log();
         
         const selectedFiles = Array.from(e.target.files);
 
@@ -53,7 +53,7 @@ const [companyIds,setCompanyIds]=useState(null)
             try {
                 const { data } = await apiHandler.post("/url", gameData);
                 success(data?.message);
-                console.log(data);
+                //console.log(data);
 
                 const newFolder = {
                     name: file.name,
@@ -101,7 +101,7 @@ const [companyIds,setCompanyIds]=useState(null)
                             : folder
                     )
                 );
-                console.log(file);
+                //console.log(file);
 
                 try {
 
@@ -113,7 +113,7 @@ const [companyIds,setCompanyIds]=useState(null)
                         "gameId": param?.id
                     }
 
-                    console.log(fileData);
+                    //console.log(fileData);
 
                     const response = await apiHandler.post("/file", fileData);
                     setGameFiles(response?.data?.data);
@@ -140,18 +140,18 @@ const [companyIds,setCompanyIds]=useState(null)
     try {
       const { data } = await apiHandler.get(`/companies`);
 
-    //   console.log(data);
+    //   //console.log(data);
       setCompanyList(data.data)
       
 //       const newSubstudio = data?.data?.map((e) => {
-//         console.log(e);
+//         //console.log(e);
         
 //         return {
 //           name: e?.name,
 //           value: e?.id
 //         }
 //       }) || [];
-// // console.log(newSubstudio);
+// // //console.log(newSubstudio);
 
 //       setCompanyList([
 //         {
@@ -171,7 +171,7 @@ const [companyIds,setCompanyIds]=useState(null)
   };
 
 const handleSelectionChange = (selectedIds) => {
-    console.log(selectedIds);
+    //console.log(selectedIds);
     
   setCompanyIds(selectedIds);
 };
@@ -179,7 +179,7 @@ const handleSelectionChange = (selectedIds) => {
 
 //   company ids 
  const handleCategories = (e) => {
-    console.log(e);
+    //console.log(e);
     
     const data = [...formData?.categoryIds || []]
     const value = e.target.value
@@ -190,12 +190,12 @@ const handleSelectionChange = (selectedIds) => {
     } else {
       data.push(value)
     }
-    // console.log(data);
+    // //console.log(data);
 
     setFormData((prev => ({ ...prev, categoryIds: data })))
   }
 
-console.log(formData);
+//console.log(formData);
 
   useEffect(()=>{
     fetchCompany()
@@ -213,7 +213,7 @@ console.log(formData);
         try {
 
             const res = await apiHandler.post("/permissions", {permissions})
-            console.log(res);
+            //console.log(res);
             
 
             success(res?.data.message)

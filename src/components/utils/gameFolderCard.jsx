@@ -16,7 +16,7 @@ const GameFolderCard = ({ uploadedFolders, handleFileChange, onSelectionChange }
       onSelectionChange(updated);
     }
   };
-console.log(uploadedFolders);
+//console.log(uploadedFolders);
 
   return (
     <div className="bg-white font-sans">

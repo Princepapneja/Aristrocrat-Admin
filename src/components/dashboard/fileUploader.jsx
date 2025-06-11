@@ -36,7 +36,7 @@ debugger
       // Call your backend API
       const response = await apiHandler.post('/file', formData);
 
-      console.log('Uploaded files:', response.data);
+      //console.log('Uploaded files:', response.data);
       setMessage('All files uploaded successfully!');
     } catch (error) {
       console.error('Upload error:', error);

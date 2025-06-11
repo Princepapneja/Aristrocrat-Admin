@@ -7,7 +7,7 @@ import InputField from './InputFields';
 
 export default function StudioDropdown({ label, showBtn ,options,onChange,name,addExclusivity}) {
 
-  // console.log(options);
+  // //console.log(options);
   
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -26,7 +26,7 @@ const handleCheck = (studio) => {
     : [...selected, studio];
 
   setSelected(updatedSelection);
-console.log(updatedSelection);
+//console.log(updatedSelection);
 
   if (onChange) {
 

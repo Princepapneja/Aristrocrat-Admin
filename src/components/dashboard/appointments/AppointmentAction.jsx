@@ -27,7 +27,7 @@ const AppointmentActions = ({ properties }) => {
             setRender(!render);
             success(data.message);
         } catch (error) {
-            console.log(error);
+            //console.log(error);
         }
     }
  
