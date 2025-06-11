@@ -9,23 +9,23 @@ const UserListingCard = ({ user }) => {
       <div className="flex items-center gap-5">
         <img
           src={UserImg}
-          alt={user.name}
+          alt={user?.firstName}
           className="w-[100px] h-[100px] object-contain rounded-[10px] shadow-sm"
         />
 
         <div className="text-sm">
           <div className="mb-1 flex">
             <span className="text-gray-500 w-[80px] font-medium">Name:</span>
-            <span className="text-black font-bold">{user.name}</span>
+            <span className="text-black font-bold">{user.firstName+" " + user?.lastName}</span>
           </div>
           <div className="mb-1 flex">
             <span className="text-gray-500 w-[80px] font-medium">Company:</span>
-            <span className="text-black font-bold">{user.company}</span>
+            <span className="text-black font-bold">{user?.company?.name}</span>
           </div>
-          <div className="mb-1 flex">
+          {/* <div className="mb-1 flex">
             <span className="text-gray-500 w-[80px] font-medium">Position:</span>
             <span className="text-black font-bold">{user.position}</span>
-          </div>
+          </div> */}
           <div className="flex">
             <span className="text-gray-500 w-[80px] font-medium">Email:</span>
             <span className="text-black font-bold">{user.email}</span>
@@ -45,12 +45,10 @@ const UserListingCard = ({ user }) => {
 
       <div className="flex flex-col gap-3">
         <button className="bg-[#00B290] w-50 text-white text-sm font-medium py-2 px-5 rounded-[10px] hover:bg-black">
-          {user?.userType === "Approved" || user?.userType === "Admin"? "Edit":"Approved"}
+          {user?.access === "approved"? "Edit":"Approved"}
         </button>
         <button className="bg-[#EF4444] w-50 text-white text-sm font-medium py-2 px-3 rounded-[10px] hover:text-[black] hover:bg-[#F6ADCD]">
-          {user?.userType === "Approved" || user?.userType === "Admin"? "Delete Account":"Deny"}
-         
-          
+          {user?.access === "approved" ? "Block Account":"Reject"}
         </button>
       </div>
     </div>

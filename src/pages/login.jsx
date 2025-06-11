@@ -106,7 +106,7 @@ debugger
               class="text-black-v1 font-medium text-[56px] not-italic leading-none font-ot-sono pl-9 max-w-[544px] w-full">
               Log in to
               Aristocrat Interactive
-              Client Area
+              Admin Area
             </h1>
 
           </div>
@@ -118,7 +118,7 @@ debugger
 
              >
 
-                <h3 className='font-semibold text-2xl not-italic  mb-2'>Log in to Our Client Area</h3>
+                <h3 className='font-semibold text-2xl not-italic  mb-2'>Log in to Admin Area</h3>
 
              
 
@@ -134,7 +134,7 @@ debugger
                       <Buttons spinner={false} onClick={ 
                         handleLogin
                       } big={true} className={"w-full"}>{ "Log in" }</Buttons>
-                      <Buttons spinner={false} onClick={ handleLogin } big={true} type="border" className={"w-full"}>{ "Create an Account" }</Buttons>
+                     
                       
                     </div>
                   </div>

@@ -9,7 +9,7 @@ const ForlderCard = ({folders}) => {
      
 
       <div className="grid grid-cols-4 gap-10 mt-20">
-                                {folders.map((folder, index) => (
+                                {folders?.map((folder, index) => (
                                     <div
                                         key={index}
                                         className="group relative bg-[#F4F4F4] rounded-[20px] w-[280px] h-[280px] p-4 flex flex-col items-center justify-center hover:shadow hover:bg-white"

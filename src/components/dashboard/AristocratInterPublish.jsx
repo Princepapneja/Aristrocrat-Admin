@@ -10,48 +10,51 @@ import { useParams } from "react-router-dom";
 import apiHandler from "../../functions/apiHandler";
 import axios from "axios";
 import GameFolderCard from "../utils/gameFolderCard";
+import GameFiles from "./GameFiles";
 
-const folders = [
-    { name: 'Background', tag: 'Studios' },
-    { name: 'Thumbnails', tag: 'Studios' },
-    { name: 'Banners' },
-    { name: 'Symbols' },
-    { name: 'Characters' },
-    { name: 'Logos' },
-];
-const tabLabels = [{name:"MEDIA PACK",key:"media"},{name:"GAME SHEET",key:"sheet"},{name:"GAME RULES",key:"rules"},{name:"CERTIFICATES",key:"certificates"}];
-
-
+const tabLabels = [{name:"MEDIA PACK",key:"Media Packs"},{name:"GAME SHEET",key:"Game Sheets"},{name:"GAME RULES",key:"Game Rules"},{name:"CERTIFICATES",key:"Certificates"}];
 
 const AristocratInterPublish = () => {
     const param = useParams()
     const { error, success } = useGlobal()
-
     const [activeStep, setActiveStep] = useState(0);
-
     const [gameFile, setGameFiles] = useState([])
     const [uploadProgress, setUploadProgress] = useState([]);
     const [uploadedFolders, setUploadedFolders] = useState([]);
   const [addExclusivity, setAddExclusivity] = useState(false);
+  const [selectedFolder,setSelectedFolder]= useState(null)
 const [companyList,setCompanyList]=useState([])
 const [companyIds,setCompanyIds]=useState(null)
+const [folders,setFolders]= useState([])
+const [files,setFiles]= useState([])
+
+const fetchFolders=async ()=>{
+    const {data} = await apiHandler.get(`games/${param.id}/folders?type=${tabLabels[activeStep]?.key}`)
+
+    debugger
+    setFolders(data?.data?.folders||[])
+    setFiles(data?.data?.files)
+}
     //console.log(gameFile);
     
     const handleFileChange = async (e) => {
         //console.log();
+        
         
         const selectedFiles = Array.from(e.target.files);
 
         selectedFiles.forEach(async (file) => {
 
             const gameData = {
-                fileName: file.name,
-                fileType: file.type,
+                name: file.name,
+                folder: tabLabels[activeStep]?.key,
+                subFolder:selectedFolder,
                 gameId: param?.id,
+                fileType:file.type
             };
 
             try {
-                const { data } = await apiHandler.post("/url", gameData);
+                const { data } = await apiHandler.post("/upload", gameData);
                 success(data?.message);
                 //console.log(data);
 
@@ -92,7 +95,13 @@ const [companyIds,setCompanyIds]=useState(null)
                     },
                 };
 
-                await axios.put(data?.data?.uploadUrl, file, config);
+                debugger
+                try {
+                 const resp=   await axios.put(data?.data?.uploadUrl, file, config);
+                    console.log(resp,"s3 resp")
+                } catch (abc) {
+console.log(abc,"s3 error")                    
+                }
 
                 setUploadedFolders((prev) =>
                     prev.map((folder) =>
@@ -103,25 +112,25 @@ const [companyIds,setCompanyIds]=useState(null)
                 );
                 //console.log(file);
 
-                try {
+                // try {
 
-                    const fileData = {
-                        "name": file?.name,
-                        "type": tabLabels[activeStep]?.key,
-                        "size": file?.size,
-                        "url": data?.data?.fileUrl,
-                        "gameId": param?.id
-                    }
+                //     const fileData = {
+                //         "name": file?.name,
+                //         "type": tabLabels[activeStep]?.key,
+                //         "size": file?.size,
+                //         "url": data?.data?.fileUrl,
+                //         "gameId": param?.id
+                //     }
 
-                    //console.log(fileData);
+                //     //console.log(fileData);
 
-                    const response = await apiHandler.post("/file", fileData);
-                    setGameFiles(response?.data?.data);
+                //     const response = await apiHandler.post("/file", fileData);
+                //     setGameFiles(response?.data?.data);
 
-                    success(response?.data?.message || "File info saved successfully.");
-                } catch (err) {
-                    error(err.message || "Failed to save file info.");
-                }
+                //     success(response?.data?.message || "File info saved successfully.");
+                // } catch (err) {
+                //     error(err.message || "Failed to save file info.");
+                // }
             } catch (err) {
                 error(err.message);
             }
@@ -199,7 +208,8 @@ const handleSelectionChange = (selectedIds) => {
 
   useEffect(()=>{
     fetchCompany()
-  },[])
+    fetchFolders()
+  },[activeStep])
 
 
     const handleSubmit = async (e) => {
@@ -316,7 +326,7 @@ const handleSelectionChange = (selectedIds) => {
 
     )}
 
-            <div className="mt-6">
+            {/* <div className="mt-6">
                 {activeStep === 0 && (
                     <>
                         <GameFolderCard
@@ -324,6 +334,7 @@ const handleSelectionChange = (selectedIds) => {
                             handleFileChange={handleFileChange}
                              onSelectionChange={handleSelectionChange}
                         />
+                          
                         <div className="flex w-full justify-between gap-2 mt-10 mb-10">
                             <button className="flex-grow bg-[#A8A8A8] text-[#6F6F6F] text-sm font-semibold py-3 px-3 rounded-[10px] cursor-pointer flex justify-center items-center gap-2" onClick={handleSubmit}>
                                 Publish
@@ -340,10 +351,11 @@ const handleSelectionChange = (selectedIds) => {
                 {activeStep === 1 && (
                     <>
                         <GameFolderCard
-                            uploadedFolders={uploadedFolders}
+                            uploadedFolders={folders}
                             handleFileChange={handleFileChange}
                              onSelectionChange={handleSelectionChange}
                         />
+                      
                         <div className="flex w-full justify-between gap-2 mt-10 mb-10">
                             <button className="flex-grow bg-[#A8A8A8] text-[#6F6F6F] text-sm font-semibold py-3 px-3 rounded-[10px] cursor-pointer flex justify-center items-center gap-2" onClick={handleSubmit}>
                                 Publish
@@ -400,7 +412,10 @@ const handleSelectionChange = (selectedIds) => {
                 
 
             </div>
+           */}
 
+
+<GameFiles handleFileChange={handleFileChange} selectedFolder={selectedFolder} setSelectedFolder={setSelectedFolder} gameId={param.id} files={files} folders={folders}/>
             <div className="fixed bottom-2 right-30 z-50 ">
                 <button
                     onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}

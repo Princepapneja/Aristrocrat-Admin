@@ -1,39 +1,43 @@
 import React, { useEffect, useState } from 'react'
-import GameCard from '../utils/GameCard'
 import InputField from '../utils/InputFields'
 import ActiveButtons from '../utils/ActiveButtons'
-import DashboardHeader from '../header-footer/dashBoardHeader'
-import { Minus } from "lucide-react";
 
 import UserListingCard from '../utils/UserListingCard'
+import apiHandler from '../../functions/apiHandler'
+let debounce=null
 function Users() {
-    const [activeStudio,setActiveStudio]= useState(0)
-    
-
-
- 
-   
-
+    const [active,setActive]= useState(0)
+    const [filter,setFilter]= useState(null)
     const [activeButtons,setActiveButtons]= useState([
         {
             name:'Approved Customer'
         },
-        {
-            name:'Admin Users'
-        },
+      
         {
             name:'Customer Requests'
         }
     ])
 
 
-  const [subStudios, setSubStudios] = useState([]);
+  const [companies, setCompanies] = useState([]);
+const [users,setUsers]= useState([])
+const fetchUsers= async ()=>{
 
-  const fetchSubStudios = async () => {
+  let  url=`users?access=${active===0 ?"approved" : "pending"}`
+if(filter?.companyId){
+  url+= `&companyId=${filter?.companyId}`
+}
+if(filter?.search){
+  url+= `&search=${filter?.search}`
+}
+  const {data}= await apiHandler.get(url)
+setUsers(data?.data?.resp)
+}
+  const fetchCompanies = async () => {
     try {
-      const { data } = await apiHandler.get(`sub-studios/${param?.id}`);
+      const { data } = await apiHandler.get(`companies`);
 
-      const newSubstudio =
+      const companies =
         data?.data?.map((e) => {
           return {
             name: e?.name,
@@ -42,12 +46,12 @@ function Users() {
         }) || [];
       // //console.log(newSubstudio);
 
-      setSubStudios([
+      setCompanies([
         {
-          name: "Select Sub Studio",
+          name: "Select a company",
           value: "",
         },
-        ...newSubstudio,
+        ...companies,
       ]);
 
       // setGames((prev) => (filters.skip === 0 ? newGames : [...prev, ...newGames]));
@@ -59,69 +63,18 @@ function Users() {
   };
 
   useEffect(() => {
-    fetchSubStudios();
-  }, []);
-
- const usersData = [
-  {
-    id: 1,
-    name: "Kami Scerri",
-    company: "Aristocrat Interactive",
-    position: "Marketing Specialist",
-    email: "Kami.Scerri@aristocrat.com",
-    userType:"Approved"
-  },
-  {
-    id: 2,
-    name: "Alex Johnson",
-    company: "Meta",
-    position: "UI/UX Designer",
-    email: "alex.johnson@meta.com",
-    userType:"Approved"
-
-  },
-  {
-    id: 3,
-    name: "Alex",
-    company: "Meta",
-    position: "UI/UX Designer",
-    email: "alex.johnson@meta.com",
-    userType:"Approved"
-
-  }
-];
- const usersData2 = [
-  {
-    id: 1,
-    name: "Kami Scerri",
-    company: "Aristocrat Interactive",
-    position: "Marketing Specialist",
-    email: "Kami.Scerri@aristocrat.com",
-    userType:"Admin"
-  },
-  {
-    id: 2,
-    name: "Alex Johnson",
-    company: "Meta",
-    position: "UI/UX Designer",
-    email: "alex.johnson@meta.com",
-    userType:"Admin"
-
-  },
+     debounce = setTimeout(() => {
+      fetchCompanies();
+      fetchUsers();
+    }, 300);
   
-];
-
- const usersData3 = [
-  {
-    id: 1,
-    name: "Kami Scerri",
-    company: "Aristocrat Interactive",
-    position: "Marketing Specialist",
-    email: "Kami.Scerri@aristocrat.com",
-    userType:"Request"
-  },
+    return () => clearTimeout(debounce);
+  }, [active, filter]);
   
-];
+const handleFilterChange = async (e)=>{
+  setFilter((prev)=>({...prev, [e.target?.name]: e.target.value}))
+
+}
 
   return (
    
@@ -129,25 +82,28 @@ function Users() {
  <div className="space-y-11">
             <div className=" mb-8 mt-10">
               <ActiveButtons
-                active={activeStudio}
+                active={active}
                 className={"grid grid-cols-3 gap-4"}
-                setActive={setActiveStudio}
+                setActive={setActive}
                 buttons={activeButtons}
               />
             </div>
           </div>
 
           {
-            activeStudio === 0 &&(
+            active === 0 &&(
 
               <>
                 <div className="flex gap-6 justify-between items-center mb-6">
         <div className="w-1/4">
           <InputField
             type="select"
-            options={subStudios}
-            id="subStudioId"
-            name="subStudioId"
+            options={companies}
+            value={filter?.companyId}
+            id="companyId"
+            name="companyId"
+            handleInputChange={handleFilterChange}
+
           />
         </div>
 
@@ -161,11 +117,14 @@ function Users() {
             type="text"
             className="outline-none bg-transparent text-[#A8A8A8] text-[16px]"
             placeholder="Keyword"
+            value={filter?.search}
+            name="search"
+            onChange={handleFilterChange}
           />
         </div>
       </div>
               
-{usersData.map((item)=>{
+{users?.map((item)=>{
   return(
  <UserListingCard user={item} key={item.id} />
 
@@ -177,55 +136,16 @@ function Users() {
             )
           }
 
-           {
-            activeStudio === 1 &&(
-
-              <>
-                <div className="flex gap-6 justify-between items-center mb-6">
-        <div className="w-1/4">
-          <InputField
-            type="select"
-            options={subStudios}
-            id="subStudioId"
-            name="subStudioId"
-          />
-        </div>
-
-        <div className="flex gap-2 grow items-center rounded-[10px] border-2 border-gray-200 py-2 px-4">
-          <img
-            className="h-3.5 w-3.5"
-            src="/logos/Search.png"
-            alt="Search"
-          />
-          <input
-            type="text"
-            className="outline-none bg-transparent text-[#A8A8A8] text-[16px]"
-            placeholder="Keyword"
-          />
-        </div>
-      </div>
-              
-{usersData2.map((item)=>{
-  return(
- <UserListingCard user={item} key={item.id} />
-
-  )
-  
-})}
-              
-              </>
-            )
-          }
-
+           
 
 
            {
-            activeStudio === 2 &&(
+            active === 1 &&(
 
               <>
 
               
-{usersData3.map((item)=>{
+{users.map((item)=>{
   return(
  <UserListingCard user={item} key={item.id} />
 

@@ -217,13 +217,17 @@ const [variationRows, setVariationRows] = useState(1);
 
 const handleNextClick = async (e) => {
   e.preventDefault();
-
+try {
   const result = await handleSubmit(e, "draft");
 //console.log(result);
 const data =result?.successData
 
  
     navigate(`/dashboard/games/aristocrat-interactive/aristocrat-interactive-publish/${data?.id}`);
+} catch (error) {
+  console.log(error)
+}
+  
  
 };
 
