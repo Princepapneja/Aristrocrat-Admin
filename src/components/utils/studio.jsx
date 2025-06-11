@@ -5,9 +5,8 @@ import { X,Plus } from 'lucide-react';
 import InputField from './InputFields';
 
 
-export default function StudioDropdown({ label, showBtn ,options,onChange,name,addExclusivity}) {
+export default function StudioDropdown({ label, showBtn ,options,onChange,name,addExclusivity,createCategory,handleCreate}) {
 
-  // //console.log(options);
   
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -26,7 +25,7 @@ const handleCheck = (studio) => {
     : [...selected, studio];
 
   setSelected(updatedSelection);
-//console.log(updatedSelection);
+// console.log(updatedSelection);
 
   if (onChange) {
 
@@ -50,9 +49,12 @@ const handleClearAll = () => {
     if (newStudio.trim() !== "" && !studiosList.includes(newStudio)) {
       studiosList.push(newStudio);
     }
+    createCategory(options[0])
     setNewStudio("");
     setShowPopup(false);
   };
+
+  
 
   const filteredStudios = options?.filter((studio) =>{
     const studioName =studio?.name || studio?.title
@@ -69,6 +71,9 @@ studioName.toLowerCase().includes(searchTerm.toLowerCase())
       setOpen(addExclusivity)
     }
   },[addExclusivity])
+
+  // console.log(filteredStudios);
+  
 
   return (
     <div ref={dropdownRef} className={`relative w-full ${addExclusivity? "top-[-30px]":""} `}>
@@ -175,13 +180,13 @@ studioName.toLowerCase().includes(searchTerm.toLowerCase())
                 onClick={() => setShowPopup(false)}
               />
             </div>
-            <InputField type='text' label={label} placeholder={`Enter ${label} Name`} onChange={onChange}/>
+            <InputField type='text' label={label} placeholder={`Enter ${label} Name`}  id='title' handleInputChange={handleCreate}/>
             <div className="flex justify-between space-x-3 mt-5">
 
               <button className="bg-[#00B290] hover:bg-[black] text-white text-sm font-semibold  w-full rounded-[10px] cursor-pointer px-4 py-2" onClick={handleAddStudio}>
                 Create {label}
               </button>
-              <button className="bg-white hover:text-black hover:border-black border w-full rounded-[10px] border-[#A8A8A8] text-gray-700 text-sm font-semibold px-4 py-2 rounded cursor-pointer" onClick={() => setShowPopup(false)}>
+              <button className="bg-white hover:text-black hover:border-black border w-full rounded-[10px] border-[#A8A8A8] text-gray-700 text-sm font-semibold px-4 py-2  cursor-pointer" onClick={() => setShowPopup(false)}>
                 Cancel
               </button>
 

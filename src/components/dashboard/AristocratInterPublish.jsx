@@ -38,7 +38,7 @@ const fetchFolders=async ()=>{
     //console.log(gameFile);
     
     const handleFileChange = async (e) => {
-        //console.log();
+        console.log();
         
         
         const selectedFiles = Array.from(e.target.files);
@@ -56,7 +56,7 @@ const fetchFolders=async ()=>{
             try {
                 const { data } = await apiHandler.post("/upload", gameData);
                 success(data?.message);
-                //console.log(data);
+                console.log(data);
 
                 const newFolder = {
                     name: file.name,
@@ -110,7 +110,7 @@ console.log(abc,"s3 error")
                             : folder
                     )
                 );
-                //console.log(file);
+                console.log(file);
 
                 // try {
 
@@ -149,18 +149,18 @@ console.log(abc,"s3 error")
     try {
       const { data } = await apiHandler.get(`/companies`);
 
-    //   //console.log(data);
+    //   console.log(data);
       setCompanyList(data.data)
       
 //       const newSubstudio = data?.data?.map((e) => {
-//         //console.log(e);
+//         console.log(e);
         
 //         return {
 //           name: e?.name,
 //           value: e?.id
 //         }
 //       }) || [];
-// // //console.log(newSubstudio);
+// // console.log(newSubstudio);
 
 //       setCompanyList([
 //         {
@@ -180,7 +180,7 @@ console.log(abc,"s3 error")
   };
 
 const handleSelectionChange = (selectedIds) => {
-    //console.log(selectedIds);
+    console.log(selectedIds);
     
   setCompanyIds(selectedIds);
 };
@@ -188,7 +188,7 @@ const handleSelectionChange = (selectedIds) => {
 
 //   company ids 
  const handleCategories = (e) => {
-    //console.log(e);
+    console.log(e);
     
     const data = [...formData?.categoryIds || []]
     const value = e.target.value
@@ -199,12 +199,12 @@ const handleSelectionChange = (selectedIds) => {
     } else {
       data.push(value)
     }
-    // //console.log(data);
+    // console.log(data);
 
     setFormData((prev => ({ ...prev, categoryIds: data })))
   }
 
-//console.log(formData);
+console.log(formData);
 
   useEffect(()=>{
     fetchCompany()
@@ -223,7 +223,7 @@ const handleSelectionChange = (selectedIds) => {
         try {
 
             const res = await apiHandler.post("/permissions", {permissions})
-            //console.log(res);
+            console.log(res);
             
 
             success(res?.data.message)

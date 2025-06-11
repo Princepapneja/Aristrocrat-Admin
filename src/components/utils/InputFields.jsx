@@ -76,12 +76,13 @@ const InputField = ({
             className="block w-full bg-transparent p-[0.6rem] border-2 border-gray-200 placeholder:font-light focus:outline-primary-dark rounded-xl text-desc"
           >
             {options?.map((option, key) => {
+              
               return (
                 <option
                   key={key}
                   disabled={option?.disable}
                   selected={option?.selected}
-                  value={option?.value}
+                  value={option?.value || option?.id}
                 >
                   {option?.name}
                 </option>

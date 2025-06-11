@@ -32,7 +32,7 @@ const [countries ,setCountries]=useState([])
 
   const [subStudios, setSubStudios] = useState([])
   const { error, success } = useGlobal()
-
+const [companyList,setCompanyList]=useState([])
 
 
 
@@ -60,6 +60,8 @@ const [variationRows, setVariationRows] = useState(1);
   const handlePartnerChange = (index, value) => {
     const updated = [...partners];
     updated[index].partner = value;
+    console.log(updated);
+    
     setPartners(updated);
   };
 
@@ -116,17 +118,13 @@ const [variationRows, setVariationRows] = useState(1);
       const newSubstudio = data?.data?.map((e) => {
         return {
           name: e?.name,
-          value: e?.id
+          id: e?.id
         }
       }) || [];
 // //console.log(newSubstudio);
 
       setSubStudios([
-        {
-          name:"Select Sub Studio",
-          value:""
-        }
-        ,
+       
         ...newSubstudio
       ])
 
@@ -143,6 +141,21 @@ const [variationRows, setVariationRows] = useState(1);
       const { data } = await apiHandler.get(`/regions`);
       //console.log(data);
       setCountries(data?.data)
+
+      
+      // setGames((prev) => (filters.skip === 0 ? newGames : [...prev, ...newGames]));
+      // setHasMore((filters.skip + filters.limit) < data.data.total);
+      // setTotalGames(data.data.total);
+    } catch (error) {
+      console.error('Failed to fetch games:', error);
+    }
+  };
+
+    const fetchCompany = async () => {
+    try {
+      const { data } = await apiHandler.get(`/companies`);
+      console.log(data);
+      setCompanyList(data?.data)
 
       
       // setGames((prev) => (filters.skip === 0 ? newGames : [...prev, ...newGames]));
@@ -187,10 +200,28 @@ const [variationRows, setVariationRows] = useState(1);
     fetchSubStudios()
     fetchTypes()
     fetchRegions()
+    fetchCompany()
   }, [])
 
   const getIpData = (e) => {
     let { name, value } = e.target;
+   
+   
+    
+if (name === "companyId") {
+  const numValue = Number(value);
+  setFormData((prev) => {
+    const safePrev = prev || {};
+    const existing = safePrev.availableFor || [];
+    const updated = existing.includes(numValue)
+      ? existing
+      : [...existing, numValue];
+
+    return { ...safePrev, availableFor: updated };
+  });
+  return;
+}
+
 
     setFormData((prev) => (
       {
@@ -202,6 +233,9 @@ const [variationRows, setVariationRows] = useState(1);
       }
     ))
   }
+
+  console.log(formData);
+  
   const handleFileUpload = (e, name) => {
   const file = e.target.files[0];
 
@@ -276,6 +310,8 @@ const data =result?.successData
     }
     const data = [...formData?.categoryIds || []]
     const value = e.target.value
+    console.log(value);
+    
     if (data.includes(value)) {
       data?.filter((q) => {
         return q !== value
@@ -283,7 +319,7 @@ const data =result?.successData
     } else {
       data.push(value)
     }
-    // //console.log(data);
+    console.log(data);
 
     setFormData((prev => ({ ...prev, categoryIds: data })))
   }
@@ -317,6 +353,57 @@ const data =result?.successData
 //   fetchGameData();
 // }, []);
 
+const [categoryFormData,setCategoryFormData]=useState(null)
+
+const handleCreate=(event)=>{
+  console.log(event);
+  
+ setCategoryFormData((prev) => {
+      return {
+        ...prev,
+        [event.target.name]: event.target.value
+      }
+    })
+
+}
+
+
+const createCategory=async(data)=>{
+
+     const payload={
+      title:categoryFormData?.title,
+      type:data?.type,
+    value:data?.id
+      
+
+     }
+     
+
+    try {
+      
+      const { data } = await apiHandler.post("/categories", payload)
+      console.log(data);
+      if(data){
+    fetchTypes()
+
+      }
+      success(data?.message)
+      
+      return { successData: data.data };
+     
+    } catch (err) {
+      error(err.message)
+      return { success: false };
+    }
+}
+
+const handleAllCheckbox = (e) => {
+  const isChecked = e.target.checked;
+  setFormData((prev) => ({
+    ...prev,
+    availableFor: isChecked ? [] : null 
+  }));
+};
 
 
   return (
@@ -337,7 +424,9 @@ const data =result?.successData
             </div>
 
             <div className="w-1/4 mt-7">
-              <InputField  type="select" options={subStudios} handleInputChange={getIpData} id='subStudioId' name='subStudioId'/>
+        <Studio className="w-full"  options={subStudios}  onChange={handleCategories}  id='subStudioId' label='Sub Studio'/>
+            
+              {/* <InputField  type="select" options={subStudios} handleInputChange={getIpData} id='subStudioId' name='subStudioId'/> */}
               {/* <Studio className="w-full" label='Studio' showBtn={false} options={subStudios} getInputData={getIpData} name="SubStudio"/> */}
             </div>
           </div>
@@ -470,17 +559,17 @@ const data =result?.successData
 
       <div className="flex justify-between gap-2 mt-10">
 
-        <Studio className="w-full" label='Features' options={feature} showBtn={true} onChange={handleCategories} name="Feature" />
+        <Studio className="w-full" label='Features' options={feature} showBtn={true} onChange={handleCategories} name="Feature"  handleCreate={handleCreate} createCategory={createCategory}/>
 
-        <Studio className="w-full" label='Game Type' showBtn={true} options={gameType} onChange={handleCategories} name="GametypeId" />
-        <Studio className="w-full" label='Theme' showBtn={true} options={theme} onChange={handleCategories} name="ThemeId" />
-        <Studio className="w-full" label='Family' showBtn={true} options={familyType} getInputData={getIpData} name="FamilyId" />
+        <Studio className="w-full" label='Game Type' showBtn={true} options={gameType} onChange={handleCategories} name="GametypeId" handleCreate={handleCreate} createCategory={createCategory}/>
+        <Studio className="w-full" label='Theme' showBtn={true} options={theme} onChange={handleCategories} name="ThemeId" handleCreate={handleCreate} createCategory={createCategory}/>
+        <Studio className="w-full" label='Family' showBtn={true} options={familyType} getInputData={getIpData} name="FamilyId" handleCreate={handleCreate} createCategory={createCategory} />
 
       </div>
 
       <div className="grid grid-cols-4 gap-4 mt-10  items-center justify-center ">
-        <Studio className="w-full" label="Volatility" showBtn={true} options={volatility} onChange={handleCategories} name="VolatilityId" />
-        <Studio className="w-full" label="Jackpots" showBtn={true} options={jackpot} onChange={handleCategories} name="JackpotsId" />
+        <Studio className="w-full" label="Volatility" showBtn={true} options={volatility} onChange={handleCategories} name="VolatilityId" handleCreate={handleCreate} createCategory={createCategory} />
+        <Studio className="w-full" label="Jackpots" showBtn={true} options={jackpot} onChange={handleCategories} name="JackpotsId" handleCreate={handleCreate} createCategory={createCategory}/>
 
         <div className="flex items-center  space-x-3 w-full">
           <span className="text-sm font-semibold text-black">Free Spins</span>
@@ -645,7 +734,8 @@ const data =result?.successData
               <Minus className="w-4 h-4 text-white p-0 bg-red-500 rounded-full " />
               <span className="text-red-500">All</span>
             </div>
-            : <InputField type="checkbox" label="All" className='bg-white flex gap-4 p-4 rounded-[10px]' />
+            : <InputField type="checkbox" label="All" className='bg-white flex gap-4 p-4 rounded-[10px]'    handleInputChange={handleAllCheckbox}
+    />
         }
 
 
@@ -657,9 +747,11 @@ const data =result?.successData
                   <InputField
                     type="select"
                     placeholder="Choose Partner/Operator"
-                    value={item.partner}
-                    onChange={(e) => handlePartnerChange(index, e.target.value)}
+                    options={companyList}
+                 handleInputChange={getIpData}
                     className='bg-white'
+                    id="companyId"
+                  
                   />
                   <X
                     size={20}
