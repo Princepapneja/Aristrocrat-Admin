@@ -1,0 +1,14 @@
+.shedow1{
+    box-shadow:  'rgba(100, 100, 111, 0.2) 0px 7px 29px 0px' ;
+}
+.selectDropdown select option{
+  color: black;
+   background: #F4F4F4;
+      border: 0 !important;
+
+}
+
+.selectDropdown select {
+  border-radius: 10px  !important;
+     border: 0 !important;
+}

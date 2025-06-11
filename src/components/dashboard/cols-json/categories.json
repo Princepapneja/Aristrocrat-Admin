@@ -1,0 +1,14 @@
+[
+    {
+      "heading": "image",
+      "type": "file",
+      "key": "image"
+    },
+    {
+      "heading": "title",
+      "key": "title",
+      "required":true
+    }
+   
+  ]
+  
