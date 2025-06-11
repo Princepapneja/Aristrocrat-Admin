@@ -1,15 +1,24 @@
-import React from "react";
+import React, { useState } from "react";
 import InputField from "./InputFields";
 import StudioDropdown from "./studio";
 
 const ListingTabel = ({ games, handleRowClick,companyList,handleLoadMore }) => {
+    const [selectedItem, setSelectedItem] = useState([]);
+
+
+    const selectedData=(data)=>{
+      console.log(data);
+      
+      setSelectedItem(data)
+
+    }
   
   return (
     <>
       {/* Filter and Search */}
-      <div className="flex gap-6 justify-between items-center mb-6">
+      {/* <div className="flex gap-6 justify-between items-center mb-6">
         <div className="w-1/4">
-         <StudioDropdown className="w-full" label='Company' showBtn={false} options={companyList} />
+         <StudioDropdown className="w-full" label='Company' showBtn={false} options={companyList} selectedData={selectedData} />
          
         </div>
 
@@ -25,7 +34,7 @@ const ListingTabel = ({ games, handleRowClick,companyList,handleLoadMore }) => {
             placeholder="Keyword"
           />
         </div>
-      </div>
+      </div> */}
 
       {/* Table */}
       <div className="mt-5">
