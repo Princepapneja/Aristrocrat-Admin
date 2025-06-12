@@ -4,13 +4,13 @@ import { toast } from 'react-toastify';
 import useGlobal from '../../hooks/useGlobal';
 
 const Modal = ({
-  openCTA,
+  openCTA=true,
   disableCTA,
   children,
   heading,
   cross,
   handleFirstCta,
-  firstCtaText,
+  firstCtaText="test",
   handleSecondCta,
   secondCtaText,
   handleCross,
