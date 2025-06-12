@@ -424,7 +424,7 @@ const handleAllCheckbox = (e) => {
             </div>
 
             <div className="w-1/4 mt-7">
-        <Studio className="w-full"  options={subStudios}  onChange={handleCategories}  id='subStudioId' label='Sub Studio'/>
+        <Studio className="w-full"  options={subStudios}  onChange={(e)=>{handleCategories({type:"subStudiosIds",value:e.target.value})}}  id='subStudioId' label='Sub Studio'/>
             
               {/* <InputField  type="select" options={subStudios} handleInputChange={getIpData} id='subStudioId' name='subStudioId'/> */}
               {/* <Studio className="w-full" label='Studio' showBtn={false} options={subStudios} getInputData={getIpData} name="SubStudio"/> */}
