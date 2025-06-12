@@ -9,6 +9,7 @@ import apiHandler from "../../functions/apiHandler";
 import ForlderCard from "../utils/forlderCard";
 import moment from "moment";
 import { dateFormat } from "../../../constants";
+import StudioDropdown from "../utils/studio";
 function AssestsDocs() {
 
 
@@ -53,7 +54,6 @@ function AssestsDocs() {
   };
 const fetchMasterList=async ()=>{
   try {
-debugger
     
     const { data } = await apiHandler.get(`/master-game-list`);
     setMasterList(data?.data)
@@ -136,7 +136,29 @@ const handleLoadMore = () => {
 
           <div className="">
             {activeStudio === 0 && (
-             <div className="bg-white ">
+
+              <>
+              <div className="flex gap-6 justify-between items-center mb-6">
+        <div className="w-1/4">
+         <StudioDropdown className="w-full" label='Company' showBtn={false} options={companyList}  />
+         
+        </div>
+
+        <div className="flex gap-2 grow items-center rounded-[10px] border-2 border-gray-200 py-2 px-4">
+          <img
+            className="h-3.5 w-3.5"
+            src="/logos/Search.png"
+            alt="Search"
+          />
+          <input
+            type="text"
+            className="outline-none bg-transparent text-[#A8A8A8] text-[16px]"
+            placeholder="Keyword"
+          />
+        </div>
+      </div>
+              
+                           <div className="bg-white ">
       <ListingTabel
   files={files}
   companyList={companyList}
@@ -147,6 +169,10 @@ const handleLoadMore = () => {
 />
 
     </div>
+              
+              
+              </>
+
             )}
             {
                 activeStudio === 1 && (

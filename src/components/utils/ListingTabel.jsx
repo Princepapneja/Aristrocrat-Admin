@@ -1,28 +1,20 @@
 import React, { useState } from "react";
 import InputField from "./InputFields";
 import StudioDropdown from "./studio";
-import moment from "moment";
-import { dateFormat } from "../../../constants";
 
-const ListingTabel = ({ files, handleRowClick,companyList,handleLoadMore }) => {
-  console.log(files)
-    const [selectedItem, setSelectedItem] = useState([]);
-
-
-    const selectedData=(data)=>{
-      console.log(data);
-      
-      setSelectedItem(data)
-
-    }
+const ListingTabel = ({ games, handleRowClick,companyList,handleLoadMore ,files}) => {
+    
+  console.log(files);
   
   return (
     <>
       {/* Filter and Search */}
       {/* <div className="flex gap-6 justify-between items-center mb-6">
         <div className="w-1/4">
-         <StudioDropdown className="w-full" label='Company' showBtn={false} options={companyList} />
+         <StudioDropdown className="w-full" label='Company' showBtn={false} options={companyList} selectedData={selectedData} />
+         
         </div>
+
         <div className="flex gap-2 grow items-center rounded-[10px] border-2 border-gray-200 py-2 px-4">
           <img
             className="h-3.5 w-3.5"
@@ -44,33 +36,32 @@ const ListingTabel = ({ files, handleRowClick,companyList,handleLoadMore }) => {
             <tr>
               <th className="py-5">Name</th>
               <th className="py-5">Product Type</th>
-              <th className="py-5">Company</th>
-              <th className="py-5">Game</th>
+              <th className=" py-5">Company</th>
+              <th className="py-5">Status</th>
               <th className="py-5">Release Date</th>
             </tr>
           </thead>
           <tbody>
-            {files?.map((file, index) => (
+            {files?.map((game, index) => (
               <tr
                 key={index}
-                onClick={() => handleRowClick(file?.id)}
+                onClick={() => handleRowClick(game?.id)}
                 className="group cursor-pointer text-xl border-b border-gray-200 transition"
               >
                 <td className="py-5 text-base font-medium text-[#6F6F6F] group-hover:text-black ">
-                  {file?.name}
+                  {game?.title}
                 </td>
-                <td className="capitalize py-5 text-base font-medium text-[#6F6F6F] group-hover:text-black">
-                  {file?.type}
-                </td>
-                <td className="capitalize py-5 text-base font-medium text-[#6F6F6F] group-hover:text-black">
-                  {file?.companies?.length > 0 ? file?.companies?.join(",") : "All"}
-                </td>
-              
                 <td className="py-5 text-base font-medium text-[#6F6F6F] group-hover:text-black">
-                  {file?.game?.title}
+                  {game?.studio?.name}
+                </td>
+                <td className="py-5 text-base font-medium text-[#6F6F6F] group-hover:text-black">
+                  Company Name
+                </td>
+                <td className="py-5 text-base font-medium vtext-[#6F6F6F] group-hover:text-black">
+                  {game.status}
                 </td>
                 <td className="py-5  text-base font-medium text-[#6F6F6F] group-hover:text-black">
-                  {moment(file?.game?.releaseDate).format(dateFormat)}
+                  {game?.releaseDate}
                 </td>
               </tr>
             ))}
@@ -80,7 +71,7 @@ const ListingTabel = ({ files, handleRowClick,companyList,handleLoadMore }) => {
         {/* Load More Button */}
         <div className="flex justify-center mt-6">
           <button className="bg-teal-500 text-white text-sm font-medium px-5 py-2 rounded hover:bg-teal-600 transition" onClick={handleLoadMore}>
-            Load More files
+            Load More Games
           </button>
         </div>
       </div>

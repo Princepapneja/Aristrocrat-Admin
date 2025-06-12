@@ -253,11 +253,15 @@ const handleNextClick = async (e) => {
   e.preventDefault();
 try {
   const result = await handleSubmit(e, "draft");
-//console.log(result);
+console.log(result);
 const data =result?.successData
 
- 
+console.log(data);
+if(data){
     navigate(`/dashboard/games/aristocrat-interactive/aristocrat-interactive-publish/${data?.id}`);
+
+}
+//  navigate(`/dashboard/games/aristocrat-interactive/aristocrat-interactive-publish/${data?.id}`);
 } catch (error) {
   console.log(error)
 }
@@ -303,14 +307,17 @@ const data =result?.successData
     }
   }
 
-  const handleCategories = (e) => {
+  const handleCategories = (e,type) => {
+    
+    
     if (e.type === "clearAll") {
       setFormData((prev => ({ ...prev, categoryIds: [] })))
       return
     }
+
+    
     const data = [...formData?.categoryIds || []]
     const value = e.target.value
-    console.log(value);
     
     if (data.includes(value)) {
       data?.filter((q) => {
@@ -324,6 +331,32 @@ const data =result?.successData
     setFormData((prev => ({ ...prev, categoryIds: data })))
   }
 
+
+    const handleSubStudio = (e,type) => {
+    
+
+       if (type === "clearAll") {
+      setFormData((prev => ({ ...prev, subStudioIds: [] })))
+      return
+    }
+    const data = [...formData?.subStudioIds || []]
+    
+    const value = e.target.value
+    console.log(value);
+    
+    if (data.includes(value)) {
+
+      data?.filter((q) => {
+        
+        return q !== value
+      })
+    } else {
+      data.push(value)
+    }
+    console.log(data);
+
+    setFormData((prev => ({ ...prev, subStudioIds: data })))
+  }
 // useEffect(() => {
 
 
@@ -424,7 +457,7 @@ const handleAllCheckbox = (e) => {
             </div>
 
             <div className="w-1/4 mt-7">
-        <Studio className="w-full"  options={subStudios}  onChange={handleCategories}  id='subStudioId' label='Sub Studio'/>
+        <Studio className="w-full"  options={subStudios}   onChange={handleSubStudio} name="subStudioId"  id='subStudioId' label='Sub Studio'/>
             
               {/* <InputField  type="select" options={subStudios} handleInputChange={getIpData} id='subStudioId' name='subStudioId'/> */}
               {/* <Studio className="w-full" label='Studio' showBtn={false} options={subStudios} getInputData={getIpData} name="SubStudio"/> */}
