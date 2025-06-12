@@ -31,7 +31,6 @@ const [files,setFiles]= useState([])
 const fetchFolders=async ()=>{
     const {data} = await apiHandler.get(`games/${param.id}/folders?type=${tabLabels[activeStep]?.key}`)
 
-    debugger
     setFolders(data?.data?.folders||[])
     setFiles(data?.data?.files)
 }
@@ -413,9 +412,11 @@ console.log(formData);
 
             </div>
            */}
-
-
-<GameFiles handleFileChange={handleFileChange} selectedFolder={selectedFolder} setSelectedFolder={setSelectedFolder} gameId={param.id} files={files} folders={folders}/>
+ 
+<div className="mt-6 w-full">
+<GameFiles  handleFileChange={handleFileChange} selectedFolder={selectedFolder} setSelectedFolder={setSelectedFolder} gameId={param.id} files={files} folders={folders}/>
+       </div>    
+           
             <div className="fixed bottom-2 right-30 z-50 ">
                 <button
                     onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
