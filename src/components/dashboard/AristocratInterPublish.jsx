@@ -11,6 +11,7 @@ import apiHandler from "../../functions/apiHandler";
 import axios from "axios";
 import GameFolderCard from "../utils/gameFolderCard";
 import GameFiles from "./GameFiles";
+import Modal from "../utils/Modal";
 
 const tabLabels = [{name:"MEDIA PACK",key:"Media Packs"},{name:"GAME SHEET",key:"Game Sheets"},{name:"GAME RULES",key:"Game Rules"},{name:"CERTIFICATES",key:"Certificates"}];
 
@@ -29,6 +30,7 @@ const [folders,setFolders]= useState([])
 const [files,setFiles]= useState([])
 
 const fetchFolders=async ()=>{
+    
     const {data} = await apiHandler.get(`games/${param.id}/folders?type=${tabLabels[activeStep]?.key}`)
 
     setFolders(data?.data?.folders||[])
@@ -51,6 +53,8 @@ const fetchFolders=async ()=>{
                 gameId: param?.id,
                 fileType:file.type
             };
+            console.log(gameData);
+            
 
             try {
                 const { data } = await apiHandler.post("/upload", gameData);
@@ -231,6 +235,8 @@ console.log(formData);
             error(err.message)
         }
     }
+
+ 
     return (
         <div className="mt-6">
             <div className="flex gap-6 justify-between items-center">
@@ -302,6 +308,8 @@ console.log(formData);
 
 
 <div className="flex justify-end items-center mb-4 relative">
+
+   
   <div  className="relative">
     <div
       className="bg-white flex items-center gap-[10px] p-4 rounded-[10px] mb-5 cursor-pointer"
@@ -318,6 +326,8 @@ console.log(formData);
     <span className="text-red-500">Delete</span>
     <X className="w-4 h-4 text-white p-0 bg-red-500 rounded-full" />
   </div>
+
+
 </div>
 
   {addExclusivity && (
@@ -414,8 +424,12 @@ console.log(formData);
            */}
  
 <div className="mt-6 w-full">
-<GameFiles  handleFileChange={handleFileChange} selectedFolder={selectedFolder} setSelectedFolder={setSelectedFolder} gameId={param.id} files={files} folders={folders}/>
-       </div>    
+<GameFolderCard  fetchFolders={fetchFolders} handleFileChange={handleFileChange} selectedFolder={selectedFolder} setSelectedFolder={setSelectedFolder} gameId={param.id} files={files} folders={folders}/>
+ 
+ 
+ 
+  </div>    
+           
            
             <div className="fixed bottom-2 right-30 z-50 ">
                 <button
