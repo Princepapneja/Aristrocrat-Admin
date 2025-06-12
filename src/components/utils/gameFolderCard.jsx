@@ -4,24 +4,10 @@ import folderImg from "../../assets/adminAssets/folder.png";
 import InputField from "./InputFields";
 import apiHandler from "../../functions/apiHandler";
 
-const GameFolderCard = ({  onSelectionChange,selectedFolder,folders,setSelectedFolder,gameId,files,fetchFolders}) => {
+const GameFolderCard = ({ handleFileChange, onSelectionChange,selectedFolder,folders,setSelectedFolder,gameId,files,fetchFolders,setShowPopup,showPopup,addNewFolder,handleInput }) => {
   // const [selectedFolders, setSelectedFolders] = useState([]);
    const [open,setOpen]= useState(false)
-    const [name,setName]= useState("")
-      const [showPopup, setShowPopup] = useState(false);
-    
-    const addNewFolder=async ()=>{
-        const {data}= await apiHandler.post("create-folder",{
-            gameId,subFolder:selectedFolder,name
-        } )
-        console.log(data,"folder")
-        fetchFolders()
-    }
 
-function handleInput(event) {
-
-    setName(event.target.value)
-  }
 
   // const toggleFolderSelection = (folderName) => {
   //   const updated = selectedFolders.includes(folderName)
@@ -96,7 +82,7 @@ function handleInput(event) {
 
       <div className="mt-15 flex justify-center">
        
-        <button onClick={() => setShowPopup(true)}
+        <button 
           className="flex items-center space-x-2 text-black text-sm font-medium cursor-pointer"
         >
           <span>Add More</span>

@@ -236,7 +236,23 @@ console.log(formData);
         }
     }
 
- 
+     const [name,setName]= useState("")
+      const [showPopup, setShowPopup] = useState(false);
+    
+   const addNewFolder=async ()=>{
+        const {data}= await apiHandler.post("create-folder",{
+            gameId:param.id,subFolder:tabLabels[activeStep]?.key,name
+        } )
+        console.log(data,"folder")
+        setShowPopup(false)
+        fetchFolders()
+    }
+
+function handleInput(event) {
+
+    setName(event.target.value)
+  }
+
     return (
         <div className="mt-6">
             <div className="flex gap-6 justify-between items-center">
@@ -309,6 +325,13 @@ console.log(formData);
 
 <div className="flex justify-end items-center mb-4 relative">
 
+ <div
+      className="bg-white flex items-center gap-[10px] p-4 rounded-[10px] mb-5 cursor-pointer"
+      onClick={() => setShowPopup(true)}
+    >
+      <span className="text-[#00B290]">Cretate Folder</span>
+      <Plus className="w-4 h-4 text-white p-0 bg-[#00B290] rounded-full" />
+    </div>
    
   <div  className="relative">
     <div
@@ -424,7 +447,7 @@ console.log(formData);
            */}
  
 <div className="mt-6 w-full">
-<GameFolderCard  fetchFolders={fetchFolders} handleFileChange={handleFileChange} selectedFolder={selectedFolder} setSelectedFolder={setSelectedFolder} gameId={param.id} files={files} folders={folders}/>
+<GameFolderCard addNewFolder={addNewFolder} showPopup={showPopup} setShowPopup={setShowPopup} handleInput={handleInput} fetchFolders={fetchFolders} handleFileChange={handleFileChange} selectedFolder={selectedFolder} setSelectedFolder={setSelectedFolder} gameId={param.id} files={files} folders={folders}/>
  
  
  
