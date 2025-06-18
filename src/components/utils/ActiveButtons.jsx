@@ -25,7 +25,7 @@ const ActiveButtons = ({ buttons, className, active, setActive, type = 'primary'
       {buttons?.map((button, index) => (
         <button
           key={index}
-          className={`text-base font-semibold ${
+          className={`text-base font-semibold ${  
             active === index ? activeClass : nonActiveClass
           }  ${common} w-full duration-300`}
           onClick={() => {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Upload, Plus, Send, Pen, Minus, X, ChevronUp, ExternalLink, SquareArrowDownRight, SquareArrowUpIcon, SquareArrowUpLeft, SquareArrowUpRight, SquareArrowOutUpRight, Search } from "lucide-react";
+import { Upload, Plus, Send, Pen, Minus, X, ChevronUp, ExternalLink, SquareArrowDownRight, SquareArrowUpIcon, SquareArrowUpLeft, SquareArrowUpRight, SquareArrowOutUpRight, Search, MoveLeft } from "lucide-react";
 import StudioDropdown from "../utils/studio";
 import folderImg from '../../assets/adminAssets/folder.png'
 import expandWindowImg from '../../assets/adminAssets/expand-window-2--expand-small-bigger-retract-smaller-big.png'
@@ -13,9 +13,9 @@ import GameFolderCard from "../utils/gameFolderCard";
 import GameFiles from "./GameFiles";
 import Modal from "../utils/Modal";
 
-const tabLabels = [{name:"MEDIA PACK",key:"Media Packs"},{name:"GAME SHEET",key:"Game Sheets"},{name:"GAME RULES",key:"Game Rules"},{name:"CERTIFICATES",key:"Certificates"}];
 
-const AristocratInterPublish = () => {
+
+const AristocratInterPublish = React.memo(() => {
     const param = useParams()
     const { error, success } = useGlobal()
     const [activeStep, setActiveStep] = useState(0);
@@ -28,28 +28,74 @@ const [companyList,setCompanyList]=useState([])
 const [companyIds,setCompanyIds]=useState(null)
 const [folders,setFolders]= useState([])
 const [files,setFiles]= useState([])
+const [subFolderFile,setSubFolderFile]=useState([])
+const [rootLevels,setRootLevels]=useState([])
+
+
+
+const fetchRootLevels=async ()=>{
+    let url=   `games/${param.id}/folders`
+    const {data} = await apiHandler.get(url)
+
+setRootLevels(data?.data?.folders||[])
+//    setFiles(data?.data?.files)
+
+
+
+    
+    console.log(uploadedFolders);
+    
+    // setUploadedFolders(data?.data?.files)
+}
 
 const fetchFolders=async ()=>{
-    
-    const {data} = await apiHandler.get(`games/${param.id}/folders?type=${tabLabels[activeStep]?.key}`)
+    let url=   `games/${param.id}/folders`
+//     const {data} = await apiHandler.get(url)
+// setFolders(data?.data?.folders||[])
+//    setFiles(data?.data?.files)
+    if(selectedFolder){
+        console.log(selectedFolder);
+        
+  url+=`?folder=${selectedFolder?.id}`
+} else{
+  url+=`?folder=${rootLevels?.[activeStep]?.id}`
 
-    setFolders(data?.data?.folders||[])
+}
+    const {data} = await apiHandler.get(url)
+console.log(data);
+
+     if(selectedFolder){
+        setSubFolderFile(data?.data?.files)
+setFolders(data?.data?.folders||[])
     setFiles(data?.data?.files)
+     }else{
+setFolders(data?.data?.folders||[])
+    setFiles(data?.data?.files)
+     }
+console.log(data);
+
+
+    
+    console.log(uploadedFolders);
+    
+    // setUploadedFolders(data?.data?.files)
 }
     //console.log(gameFile);
+
+
+    useEffect(()=>{
+        setUploadedFolders([]);
+        // setFiles([])
+
+    },[param.id])
     
     const handleFileChange = async (e) => {
-        console.log();
-        
-        
         const selectedFiles = Array.from(e.target.files);
-
         selectedFiles.forEach(async (file) => {
-
             const gameData = {
                 name: file.name,
-                folder: tabLabels[activeStep]?.key,
-                subFolder:selectedFolder,
+                // folder: rootLevels[activeStep]?.id,
+                // subFolder:selectedFolder,
                 gameId: param?.id,
                 fileType:file.type
             };
@@ -59,6 +105,8 @@ const fetchFolders=async ()=>{
             try {
                 const { data } = await apiHandler.post("/upload", gameData);
                 success(data?.message);
+                    fetchFolders()
+
                 console.log(data);
 
                 const newFolder = {
@@ -98,8 +146,9 @@ const fetchFolders=async ()=>{
                     },
                 };
 
-                debugger
                 try {
+debugger
+
                  const resp=   await axios.put(data?.data?.uploadUrl, file, config);
                     console.log(resp,"s3 resp")
                 } catch (abc) {
@@ -115,25 +164,25 @@ console.log(abc,"s3 error")
                 );
                 console.log(file);
 
-                // try {
+                try {
 
-                //     const fileData = {
-                //         "name": file?.name,
-                //         "type": tabLabels[activeStep]?.key,
-                //         "size": file?.size,
-                //         "url": data?.data?.fileUrl,
-                //         "gameId": param?.id
-                //     }
+                    const fileData = {
+                        "name": file?.name,
+                        "folderId": selectedFolder?.id || rootLevels[activeStep]?.id,
+                        "size": file?.size,
+                        "url": data?.data?.fileUrl,
+                        "gameId": param?.id
+                    }
 
-                //     //console.log(fileData);
+                    //console.log(fileData);
 
-                //     const response = await apiHandler.post("/file", fileData);
-                //     setGameFiles(response?.data?.data);
+                    const response = await apiHandler.post("/file", fileData);
+                    setGameFiles(response?.data?.data);
 
-                //     success(response?.data?.message || "File info saved successfully.");
-                // } catch (err) {
-                //     error(err.message || "Failed to save file info.");
-                // }
+                    success(response?.data?.message || "File info saved successfully.");
+                } catch (err) {
+                    error(err.message || "Failed to save file info.");
+                }
             } catch (err) {
                 error(err.message);
             }
@@ -183,7 +232,7 @@ console.log(abc,"s3 error")
   };
 
 const handleSelectionChange = (selectedIds) => {
-    console.log(selectedIds);
+    // console.log(selectedIds);
     
   setCompanyIds(selectedIds);
 };
@@ -191,7 +240,6 @@ const handleSelectionChange = (selectedIds) => {
 
 //   company ids 
  const handleCategories = (e) => {
-    console.log(e);
     
     const data = [...formData?.categoryIds || []]
     const value = e.target.value
@@ -210,11 +258,17 @@ const handleSelectionChange = (selectedIds) => {
 console.log(formData);
 
   useEffect(()=>{
+    // console.log(selectedFolder);
+    
     fetchCompany()
     fetchFolders()
-  },[activeStep])
+  },[activeStep,uploadedFolders,selectedFolder,rootLevels])
 
 
+  useEffect(()=>{
+    fetchRootLevels()
+
+  },[])
     const handleSubmit = async (e) => {
 
        const permissions = [
@@ -240,8 +294,9 @@ console.log(formData);
       const [showPopup, setShowPopup] = useState(false);
     
    const addNewFolder=async ()=>{
-        const {data}= await apiHandler.post("create-folder",{
-            gameId:param.id,subFolder:tabLabels[activeStep]?.key,name
+        const {data}= await apiHandler.post("folder",{
+            gameId:param.id,parentId: selectedFolder?.id|| rootLevels[activeStep]?.id,name
+
         } )
         console.log(data,"folder")
         setShowPopup(false)
@@ -282,7 +337,7 @@ function handleInput(event) {
             </div>
 
             <div className="flex items-center justify-between mt-15">
-                {tabLabels.map((label, index) => (
+                {rootLevels.map((label, index) => (
                     <React.Fragment key={index}>
                         <div
                             className={`flex items-center  gap-5  cursor-pointer px-2 py-3  w-[250px] ${activeStep === index ? 'bg-[#00B290]' : 'bg-[rgba(148,255,128,0.3)]  hover:text-[#00B290] '} rounded-[31px] `}
@@ -301,7 +356,7 @@ function handleInput(event) {
                                 {label?.name}
                             </span>
                         </div>
-                        {index < tabLabels.length - 1 && (
+                        {index < rootLevels.length - 1 && (
                             <div className="text-gray-400 text-xl"><ChevronRight className="w-[50px] h-[55px] text-[#00B29099] font-light"
 
                             /></div>
@@ -321,10 +376,41 @@ function handleInput(event) {
                 </button>
             </div>
 
-
+<div className={`flex  ${selectedFolder?"justify-between":"justify-end"} items-center `}>
+ {
+    selectedFolder && (
+         <button className="border border-[#A8A8A8] px-2 py-1 rounded-[10px]  text-balck] font-semibold flex items-center gap-2 cursor-pointer" onClick={() => setSelectedFolder(null)}>
+                <MoveLeft className="w-4 h-4  " />
+                Go Back
+              </button> 
+    ) 
+}
 
 <div className="flex justify-end items-center mb-4 relative">
 
+{/* {
+    selectedFolder?"": <div
+      className="bg-white flex items-center gap-[10px] p-4 rounded-[10px] mb-5 cursor-pointer"
+      onClick={() => setShowPopup(true)}
+    >
+      <span className="text-[#00B290]">Cretate Folder</span>
+      <Plus className="w-4 h-4 text-white p-0 bg-[#00B290] rounded-full" />
+    </div>
+}
+
+{
+    selectedFolder?"":  <div  className="relative">
+    <div
+      className="bg-white flex items-center gap-[10px] p-4 rounded-[10px] mb-5 cursor-pointer"
+      onClick={() => setAddExclusivity(!addExclusivity)}
+    >
+      <span className="text-[#00B290]">Add Exclusivity</span>
+      <Minus className="w-4 h-4 text-white p-0 bg-[#00B290] rounded-full" />
+    </div>
+
+  
+  </div>
+} */}
  <div
       className="bg-white flex items-center gap-[10px] p-4 rounded-[10px] mb-5 cursor-pointer"
       onClick={() => setShowPopup(true)}
@@ -332,8 +418,9 @@ function handleInput(event) {
       <span className="text-[#00B290]">Cretate Folder</span>
       <Plus className="w-4 h-4 text-white p-0 bg-[#00B290] rounded-full" />
     </div>
-   
-  <div  className="relative">
+
+
+<div  className="relative">
     <div
       className="bg-white flex items-center gap-[10px] p-4 rounded-[10px] mb-5 cursor-pointer"
       onClick={() => setAddExclusivity(!addExclusivity)}
@@ -345,6 +432,7 @@ function handleInput(event) {
   
   </div>
 
+
   <div className="bg-white flex items-center gap-[10px] p-4 rounded-[10px] mb-5 ml-4 cursor-pointer">
     <span className="text-red-500">Delete</span>
     <X className="w-4 h-4 text-white p-0 bg-red-500 rounded-full" />
@@ -352,6 +440,9 @@ function handleInput(event) {
 
 
 </div>
+</div>
+
+
 
   {addExclusivity && (
        <StudioDropdown className="w-full" label='Studio' showBtn={false} options={companyList} addExclusivity={addExclusivity} onChange={handleCategories} name="companyIds" />
@@ -447,7 +538,7 @@ function handleInput(event) {
            */}
  
 <div className="mt-6 w-full">
-<GameFolderCard addNewFolder={addNewFolder} showPopup={showPopup} setShowPopup={setShowPopup} handleInput={handleInput} fetchFolders={fetchFolders} handleFileChange={handleFileChange} selectedFolder={selectedFolder} setSelectedFolder={setSelectedFolder} gameId={param.id} files={files} folders={folders}/>
+<GameFolderCard type={rootLevels?.[activeStep]?.id}  uploadedFolders={uploadedFolders} addNewFolder={addNewFolder} showPopup={showPopup} setShowPopup={setShowPopup} handleInput={handleInput} fetchFolders={fetchFolders} handleFileChange={handleFileChange} selectedFolder={selectedFolder} setSelectedFolder={setSelectedFolder} gameId={param.id} files={files} folders={folders} onSelectionChange={handleSelectionChange} subFolderFile={subFolderFile}/>
  
  
  
@@ -476,6 +567,6 @@ function handleInput(event) {
 
         </div>
     );
-};
+});
 
 export default AristocratInterPublish;

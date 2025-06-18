@@ -15,75 +15,81 @@ import AristocratInteractive from './src/components/dashboard/AristocratInteract
 import AristocratInterPublish from './src/components/dashboard/AristocratInterPublish';
 import AssetsDocument from './src/components/dashboard/AssestsDocs';
 import Users from './src/components/dashboard/Users';
-
+import SignUp from './src/pages/SignUp';
+import ForgotPassword from './src/pages/ForgotPassword';
+import ProtectedRoute from './src/components/auth/ProtectedRoute';
 const Route = () => {
     const router = createBrowserRouter([
         {
             path: '/',
             element: <RootLayout/>,
             children:[
-                {
+               {
                     path: '/',
-                    element:<Login />
+                    element:<Login   />
                 },
 
                 
                 {
                     path: '/forgot-password',
-                    element: <Login type={"forgot pass"}/>
+                    element: <ForgotPassword />
                 },
+                // {
+                //     path: '/sign-up',
+                //     element: <SignUp />
+                // },
                         {
                             path: '/dashboard',
                             element: <DashboardLayout />,
                             children:[
                                 {
                                     path: '/dashboard',
-                                    element:  <Homepage />,
+                                    element:<ProtectedRoute>  <Homepage />,</ProtectedRoute>
                                 },
                                
                                 {
                                     path:'/dashboard/certificates',
-                                    element:<Certificates/>
+                                    element:<ProtectedRoute><Certificates/></ProtectedRoute>
                                 },
                                 {
                                     path:'/dashboard/master-game-list',
-                                    element:<MasterGame/>
+                                    element:<ProtectedRoute><MasterGame/></ProtectedRoute>
                                 },
                                 {
                                     path:'/dashboard/support',
-                                    element:<ContactUs/>
+                                    element:<ProtectedRoute><ContactUs/></ProtectedRoute>
                                 },
                                 {
                                     path:'/dashboard/assets-documents',
-                                    element:<AssetsDocument/>
+                                    element:<ProtectedRoute><AssetsDocument/></ProtectedRoute>
                                 },
                                 {
                                     path:'/dashboard/games',
-                                    element:<GamePage/>
+                                    element:<ProtectedRoute><GamePage/></ProtectedRoute>
                                 },
                                 {
                                     path:'/dashboard/add-games/:id',
-                                    element:<AristocratInteractive/>
+                                    element:<ProtectedRoute><AristocratInteractive/></ProtectedRoute>
                                 },
                                  {
                                     path:'/dashboard/games/aristocrat-interactive/aristocrat-interactive-publish/:id',
-                                    element:<AristocratInterPublish/>
+                                    element:<ProtectedRoute><AristocratInterPublish/></ProtectedRoute>
                                 },
                                 {
                                     path:'/dashboard/users',
-                                    element:<Users/>
+                                    element:<ProtectedRoute><Users/></ProtectedRoute>
                                 },
                                 {
                                     path:'/dashboard/home',
-                                    element:<Homepage/>
+                                    element:<ProtectedRoute><Homepage/></ProtectedRoute>
                                 },
                                 {
                                   path:"/dashboard/detail-game/:id",
-                                  element:<DetailGame />
+                                  element:<ProtectedRoute><DetailGame /></ProtectedRoute>
                                 },
                                 {
                                   path:"/dashboard/test",
-                                  element:<FolderUploader />
+                                  element:<ProtectedRoute><FolderUploader /></ProtectedRoute>
                                 },
                                
 

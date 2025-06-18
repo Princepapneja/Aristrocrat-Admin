@@ -4,8 +4,11 @@ import ActiveButtons from '../utils/ActiveButtons'
 
 import UserListingCard from '../utils/UserListingCard'
 import apiHandler from '../../functions/apiHandler'
+import useGlobal from '../../hooks/useGlobal'
 let debounce=null
 function Users() {
+    const { error, success } = useGlobal()
+
     const [active,setActive]= useState(0)
     const [filter,setFilter]= useState(null)
     const [activeButtons,setActiveButtons]= useState([
@@ -21,6 +24,7 @@ function Users() {
 
   const [companies, setCompanies] = useState([]);
 const [users,setUsers]= useState([])
+
 const fetchUsers= async ()=>{
 
   let  url=`users?access=${active===0 ?"approved" : "pending"}`
@@ -31,6 +35,8 @@ if(filter?.search){
   url+= `&search=${filter?.search}`
 }
   const {data}= await apiHandler.get(url)
+  console.log(data);
+  
 setUsers(data?.data?.resp)
 }
   const fetchCompanies = async () => {
@@ -76,6 +82,28 @@ const handleFilterChange = async (e)=>{
 
 }
 
+const handleSubmit =async(id,access)=>{
+
+ 
+  try {
+     
+
+      const { data } = await apiHandler.patch(`/users/${id}`, {access:access} );
+     console.log(data);
+     
+      success(data?.message)
+      fetchUsers()
+      
+
+
+
+      
+    } catch (err) {
+      error(err.message);
+    }
+
+}
+
   return (
    
    <>
@@ -83,7 +111,7 @@ const handleFilterChange = async (e)=>{
             <div className=" mb-8 mt-10">
               <ActiveButtons
                 active={active}
-                className={"grid grid-cols-3 gap-4"}
+                className={"grid grid-cols-2 gap-4"}
                 setActive={setActive}
                 buttons={activeButtons}
               />
@@ -126,7 +154,7 @@ const handleFilterChange = async (e)=>{
               
 {users?.map((item)=>{
   return(
- <UserListingCard user={item} key={item.id} />
+ <UserListingCard user={item} key={item.id} handleSubmit={handleSubmit}/>
 
   )
   
@@ -147,7 +175,7 @@ const handleFilterChange = async (e)=>{
               
 {users.map((item)=>{
   return(
- <UserListingCard user={item} key={item.id} />
+ <UserListingCard user={item} key={item.id} handleSubmit={handleSubmit}/>
 
   )
   

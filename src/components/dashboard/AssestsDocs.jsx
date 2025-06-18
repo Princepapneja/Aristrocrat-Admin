@@ -56,6 +56,8 @@ const fetchMasterList=async ()=>{
   try {
     
     const { data } = await apiHandler.get(`/master-game-list`);
+    console.log(data);
+    
     setMasterList(data?.data)
   } catch (error) {
     
@@ -99,6 +101,8 @@ const fetchFiles = async () => {
   try {
     const query = new URLSearchParams(filters).toString();
     const { data } = await apiHandler.get(`/files?${query}`);
+    console.log(data);
+    
     const newFiles = data?.data?.resp || [];
 
     setFiles((prev) => (filters.skip === 0 ? newFiles : [...prev, ...newFiles]));

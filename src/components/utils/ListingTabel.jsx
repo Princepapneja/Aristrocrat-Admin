@@ -49,7 +49,7 @@ const ListingTabel = ({ games, handleRowClick,companyList,handleLoadMore ,files}
                 className="group cursor-pointer text-xl border-b border-gray-200 transition"
               >
                 <td className="py-5 text-base font-medium text-[#6F6F6F] group-hover:text-black ">
-                  {game?.title}
+                  {game?.game?.title}
                 </td>
                 <td className="py-5 text-base font-medium text-[#6F6F6F] group-hover:text-black">
                   {game?.studio?.name}

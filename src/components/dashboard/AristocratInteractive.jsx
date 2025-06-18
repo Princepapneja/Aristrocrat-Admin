@@ -103,11 +103,25 @@ const [variationRows, setVariationRows] = useState(1);
     setDates([...dates, { id: "", date: "" }]);
   };
 
-  const handleRemove = (index) => {
-    const updatedDates = [...dates];
-    updatedDates.splice(index, 1);
-    setDates(updatedDates);
-  };
+const handleRemove = (index) => {
+  const updatedDates = [...dates];
+  updatedDates.splice(index, 1);
+  setDates(updatedDates);
+
+  const regionalReleaseDates = updatedDates.reduce((acc, item) => {
+    if (item.id && item.date) {
+      acc[item.id] = new Date(item.date).toISOString();
+    }
+    return acc;
+  }, {});
+
+  
+  setFormData((prev) => ({
+    ...prev,
+    regionalReleaseDates
+  }));
+};
+
 
   const fetchSubStudios = async () => {
     try {
@@ -123,11 +137,10 @@ const [variationRows, setVariationRows] = useState(1);
       }) || [];
 // //console.log(newSubstudio);
 
-      setSubStudios([
-       
-        ...newSubstudio
-      ])
-
+    setSubStudios([
+      { name: "Select SubStudio", id: "", },
+      ...newSubstudio
+    ]);
       // setGames((prev) => (filters.skip === 0 ? newGames : [...prev, ...newGames]));
       // setHasMore((filters.skip + filters.limit) < data.data.total);
       // setTotalGames(data.data.total);
@@ -272,7 +285,6 @@ if(data){
 
   const handleSubmit = async (e,status) => {
     e.preventDefault()
-
     
 
     try {
@@ -291,12 +303,12 @@ if(data){
       status, 
     };
 
-    //console.log(finalData);
+    console.log(finalData);
     
       const { data } = await apiHandler.post("/games", finalData)
       success(data?.message)
       //console.log(data.data);
-      
+      setFormData(null)
       return { successData: data.data };
       // //console.log(data);
 
@@ -357,34 +369,42 @@ if(data){
 
     setFormData((prev => ({ ...prev, subStudioIds: data })))
   }
-// useEffect(() => {
+useEffect(() => {
 
 
-//   const fetchGameData = async () => {
-//     try {
-//       const { data } = await apiHandler.get(`/games`);
-//       //console.log(data?.data?.games[0]);
+  const fetchGameData = async () => {
+    try {
+      const { data } = await apiHandler.get(`/game/11`);
+      console.log(data)
       
     
-//       setFormData({
-//         GameName: data?.data?.games[0].title || '',
-//         SubStudio: data?.data?.games[0].subStudioId || '',
-//         GameDes: data?.data?.games[0].description || '',
-//         gameDemoLink: data?.data?.games[0].gameDemoLink || '',
-//         categoryIds: data?.data?.games[0].categories || [],
-//         releaseDate: data?.data?.games[0].releaseDate || '',
-//         // variations: data?.data?.games[0].variations || [{ variation: "", rtp: "" }],
-//         freeSpins: data?.data?.games[0].freeSpins || false,
-//         // partners: data?.data?.games[0].partners || [{ partner: '' }],
-//         // ... Add all other fields here based on the structure of your API response
-//       });
-//     } catch (err) {
-//       console.error("Error fetching game data: ", err);
-//     }
-//   };
+      // setFormData({
+      //   title: data?.data?.title || '',
+      //   subStudioId: data?.data?.subStudioId || '',
+      //   description: data?.data?.description || '',
+      //   demoLink: data?.data?.demoLink || '',
+      //   categories: data?.data?.categories || [],
+      //   releaseDate: data?.data?.releaseDate || '',
+      //   gameKey: data?.data?.gameKey || '',
+      //   livesWays: data?.data?.livesWays || '',
+      //   max: data?.data?.max || '',
+      //   maxExposure: data?.data?.maxExposure || '',
+      //   realType: data?.data?.realType || '',
+      //   min: data?.data?.min || '',
+        
 
-//   fetchGameData();
-// }, []);
+      //   // variations: data?.data?.variations || [{ variation: "", rtp: "" }],
+      //   freeSpins: data?.data?.freeSpins || false,
+      //   // partners: data?.data?.partners || [{ partner: '' }],
+      //   // ... Add all other fields here based on the structure of your API response
+      // });
+    } catch (err) {
+      console.error("Error fetching game data: ", err);
+    }
+  };
+
+  fetchGameData();
+}, [param?.id]);
 
 const [categoryFormData,setCategoryFormData]=useState(null)
 
@@ -437,6 +457,39 @@ const handleAllCheckbox = (e) => {
     availableFor: isChecked ? [] : null 
   }));
 };
+console.log(formData);
+
+const [variationColumns, setVariationColumns] = useState([
+  { id: '1', name: 'Variation 1' },
+  { id: '2', name: 'Variation 2' },
+  { id: '3', name: 'Variation 3' },
+  { id: '4', name: 'Variation 4' },
+  { id: '5', name: 'Variation 1 USA' },
+  { id: '6', name: 'Variation 2 USA' },
+  { id: '7', name: 'Variation 3 USA' },
+  { id: '8', name: 'Variation 4 USA' }
+]);
+
+const [rtpColumns, setRtpColumns] = useState([
+  { id: '1', name: 'RTP 1' },
+  { id: '2', name: 'RTP 2' },
+  { id: '3', name: 'RTP 3' },
+  { id: '4', name: 'RTP 4' },
+  { id: '5', name: 'RTP 1 USA' },
+  { id: '6', name: 'RTP 2 USA' },
+  { id: '7', name: 'RTP 3 USA' },
+  { id: '8', name: 'RTP 4 USA' }
+]);
+
+
+  const [extraRows, setExtraRows] = useState([]);
+
+const handleAddMore = () => {
+  const nextIndex = extraRows.length + 5; 
+
+  setExtraRows(prev => [...prev, nextIndex]);
+};
+
 
 
   return (
@@ -452,14 +505,15 @@ const handleAllCheckbox = (e) => {
                 className="w-full rounded-[10px] border-2  border-gray-200 px-4 py-2"
                 onChange={getIpData}
                 name="title"
+                value={formData?.title}
               />
               
             </div>
 
             <div className="w-1/4 mt-7">
-        <Studio className="w-full"  options={subStudios}   onChange={handleSubStudio} name="subStudioId"  id='subStudioId' label='Sub Studio'/>
+        {/* <Studio className="w-full"  options={subStudios}   onChange={handleSubStudio} name="subStudioId"  id='subStudioId' label='Sub Studio'/> */}
             
-              {/* <InputField  type="select" options={subStudios} handleInputChange={getIpData} id='subStudioId' name='subStudioId'/> */}
+              <InputField  type="select" options={subStudios} handleInputChange={getIpData} id='subStudioId' name='subStudioId' value={formData?.subStudioId}/>
               {/* <Studio className="w-full" label='Studio' showBtn={false} options={subStudios} getInputData={getIpData} name="SubStudio"/> */}
             </div>
           </div>
@@ -474,6 +528,7 @@ const handleAllCheckbox = (e) => {
                 placeholder="GameKeyHere"
                 onChange={getIpData}
                 name="description"
+                value={formData?.description}
               />
             </div>
 
@@ -498,6 +553,7 @@ const handleAllCheckbox = (e) => {
                           className="hidden"
                           onChange={(e) => handleFileUpload(e, name)}
                           name={name}
+                          multiple
                           
                         />
                         
@@ -529,74 +585,92 @@ const handleAllCheckbox = (e) => {
             className="w-full border border-gray-300 rounded-md px-4 py-2"
             name="demoLink"
             onChange={getIpData}
+            value={formData?.demoLink}
 
 
           />
         </div>
 
-{Array.from({ length: variationRows }).map((_, rowIndex) => (
-  <React.Fragment key={rowIndex}>
-    {/* Variation Row */}
-    <div className="grid grid-cols-2 md:grid-cols-8 gap-4 text-center text-sm font-semibold mb-2 mt-10">
-      {[...Array(8)].map((_, index) => {
-        const labelIndex = (rowIndex * 4) + (index % 4) + 1;
-        const isUSA = index >= 4;
-        const id = `variation_${labelIndex}${isUSA ? '_USA' : ''}`; 
-        return (
-          <InputField
-            key={id}
-            id={id}
-            type="text"
-            label={`Variation ${labelIndex} ${isUSA ? 'USA' : ''}`} 
-            handleInputChange={getIpData}
-          />
-        );
-      })}
+<div>
+      {/* Labels + Inputs for Variations */}
+      <div className="grid grid-cols-2 md:grid-cols-8 gap-4 text-center text-sm font-semibold mb-2 mt-10">
+        {variationColumns.map((val) => {
+          
+          // const id = `variation_${index + 1}`;
+          return (
+            <InputField
+              key={val?.id}
+              id={val?.name}
+              type="text"
+              label={val?.name}
+              handleInputChange={getIpData}
+            />
+          );
+        })}
+
+      {rtpColumns.map((val, idx) => {
+          
+          // const id = `variation_${index + 1}`;
+          return (
+            <InputField
+              key={val?.id}
+              id={val?.name}
+              type="text"
+              label={val?.name}
+              handleInputChange={getIpData}
+            />
+          );
+        })}
+
+      </div>
+      
+         <div className="space-y-4 grid grid-cols-2 md:grid-cols-8 gap-4 text-center text-sm font-semibold mb-2 mt-10">
+        {extraRows.map((rowNum, i) => {
+          
+       return (
+          <div key={i} className="flex flex-col space-y-1">
+           <InputField
+              key={rowNum}
+              id={rowNum>8?`Variation ${rowNum} USA`:`Variation ${rowNum}`}
+              type="text"
+              label={rowNum>8?`Variation ${rowNum} USA`:`Variation ${rowNum}`}
+              handleInputChange={getIpData}
+
+            />
+<InputField
+              key={i}
+              id={rowNum>8?`RTP ${rowNum} USA`:`RTP ${rowNum}`}
+              type="text"
+              label={rowNum>8?`RTP ${rowNum} USA`:`RTP ${rowNum}`}
+              handleInputChange={getIpData}
+            />
+          </div>
+        )})}
+      </div>
+
+      {/* Labels + Inputs for RTPs */}
+     
+
+      {/* Add More Button */}
+      <div className="mt-10 flex justify-center">
+        <button
+          className="flex items-center space-x-2 text-black text-sm font-medium cursor-pointer"
+          onClick={handleAddMore}
+        >
+          <span>Add More</span>
+          <Plus size={35} className="border rounded-[5px]" />
+        </button>
+      </div>
     </div>
-
-    {/* RTP Row */}
-    <div className="grid grid-cols-2 md:grid-cols-8 gap-4 text-center text-sm font-semibold mb-2 mt-2">
-      {[...Array(8)].map((_, index) => {
-        const labelIndex = (rowIndex * 4) + (index % 4) + 1;
-        const isUSA = index >= 4;
-        const id = `rtp_${labelIndex}${isUSA ? '_USA' : ''}`;  
-        return (
-          <InputField
-            key={id}
-            id={id}
-            type="text"
-            label={`RTP ${labelIndex} ${isUSA ? 'USA' : ''}`} 
-            handleInputChange={getIpData}
-          />
-        );
-      })}
-    </div>
-  </React.Fragment>
-))}
-
-
-
-
-
-
-        <div className="mt-10  flex justify-center">
-          <button
-  className="flex items-center space-x-2 text-black text-sm font-medium cursor-pointer"
-  onClick={() => setVariationRows(prev => prev + 1)}
->
-  <span>Add More</span>
-  <Plus size={35} className="border  rounded-[5px]" />
-</button>
-        </div>
       </div>
 
       <div className="flex justify-between gap-2 mt-10">
 
-        <Studio className="w-full" label='Features' options={feature} showBtn={true} onChange={handleCategories} name="Feature"  handleCreate={handleCreate} createCategory={createCategory}/>
+        <Studio className="w-full" label='Features' options={feature} showBtn={true} onChange={handleCategories} name="Feature"  handleCreate={handleCreate} createCategory={createCategory} />
 
         <Studio className="w-full" label='Game Type' showBtn={true} options={gameType} onChange={handleCategories} name="GametypeId" handleCreate={handleCreate} createCategory={createCategory}/>
         <Studio className="w-full" label='Theme' showBtn={true} options={theme} onChange={handleCategories} name="ThemeId" handleCreate={handleCreate} createCategory={createCategory}/>
-        <Studio className="w-full" label='Family' showBtn={true} options={familyType} getInputData={getIpData} name="FamilyId" handleCreate={handleCreate} createCategory={createCategory} />
+        <Studio className="w-full" label='Family' showBtn={true} options={familyType} onChange={handleCategories} name="FamilyId" handleCreate={handleCreate} createCategory={createCategory} />
 
       </div>
 
@@ -628,6 +702,7 @@ const handleAllCheckbox = (e) => {
               className="w-full border-none outline-none focus:ring-0 text-sm"
               onChange={getIpData}
               name="min"
+               value={formData?.min}
 
             />
             <input
@@ -636,6 +711,8 @@ const handleAllCheckbox = (e) => {
               className="w-full border-none outline-none focus:ring-0 text-sm"
               onChange={getIpData}
               name="max"
+               value={formData?.max}
+
             />
           </div>
         </div>
@@ -646,6 +723,7 @@ const handleAllCheckbox = (e) => {
           handleInputChange={getIpData}
           id='livesWays'
           name='livesWays'
+          value={formData?.livesWays}
         />
         <InputField
 
@@ -653,6 +731,7 @@ const handleAllCheckbox = (e) => {
           label='Real Type'
           handleInputChange={getIpData}
           id='realType'
+          value={formData?.realType}
 
         />
         <InputField
@@ -661,6 +740,7 @@ const handleAllCheckbox = (e) => {
           type="number"
           label='Max Exposure'
           handleInputChange={getIpData}
+          value={formData?.maxExposure}
 
         />
 
@@ -676,20 +756,22 @@ const handleAllCheckbox = (e) => {
             placeholder="Game Key Here"
             onChange={getIpData}
             name="gameKey"
+             value={formData?.gameKey}
+            
           />
         </div>
 
       </div>
 
-      <div className="w-full bg-[#F4F4F4] p-6 rounded-[10px] mt-5">
-        <h2 className="text-2xl font-semibold leading-[24px] mb-4">Release Date</h2>
+      <div className="w-full bg-[#F4F4F4] p-10 rounded-[10px] mt-5 container">
+        <h2 className="text-2xl font-semibold px-4 leading-[24px] mb-4">Release Date</h2>
 
-        <div className="flex items-center justify-between mb-4 border-b-1 pb-5  border-gray-300 ">
+        <div className="flex items-center p-4 justify-between mb-4 border-b-1 pb-5  border-gray-300 me-19">
           <span className="font-semibold leading-[24px] text-xl text-[#6F6F6F]">General</span>
           <input
             type="date"
-            className="border border-gray-300 rounded-[10px] px-2 py-1 bg-[#00B290] text-white hover:bg-[black] custom-date me-31"
-
+            className="border border-gray-300 rounded-[10px] px-2 py-1 bg-[#00B290] text-white hover:bg-[black] custom-date"
+  value={formData?.releaseDate}
             onChange={(e) =>
     setFormData((prev) => ({
       ...prev,
@@ -703,31 +785,44 @@ const handleAllCheckbox = (e) => {
         </div>
 
         {dates.map((item, index) => (
-          <div key={index} className="flex items-center justify-evenly space-x-4 mb-3 ">
-            <select
-              className="w-2/3   rounded-[10px] px-2 py-1 bg-[#FAFAFA] focus:outline-none text-black"
-              value={item.country}
-              onChange={(e) => handleChange(index, "id", e.target.value)}
-            >
-              <option value="">Choose Country</option>
-              {countries.map((country, idx) => (
-                <option key={country?.id} value={country?.id}>
-                  {country?.name}
-                </option>
-              ))}
-            </select>
+          <div key={index} className="flex items-center justify-between gap-1 p-4">
+           <div className="relative w-3/4   rounded-[10px] ">
+  <select
+    className="appearance-none text-base font-semibold w-full bg-[#FAFAFA] border border-gray-300 text-black py-2 px-4 pr-10 rounded-[10px] focus:outline-none"
+    value={item.country}
+    onChange={(e) => handleChange(index, "id", e.target.value)}
+  >
+    <option value="">Choose Country</option>
+    {countries.map((country) => (
+      <option key={country.id} value={country.id}>
+        {country.name}
+      </option>
+    ))}
+  </select>
+
+  {/* Custom Dropdown Icon */}
+  <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-black">
+    <svg
+      className="w-5 h-5 text-[#A8A8A8]"
+      fill="currentColor"
+      viewBox="0 0 20 20"
+    >
+      <path d="M5.25 7.75L10 12.5l4.75-4.75" stroke="currentColor" strokeWidth="1.5" fill="none" />
+    </svg>
+  </div>
+</div>
 
             <input
               type="date"
-              className="border border-gray-300 rounded-[10px] px-2 py-1 bg-[#00B290] text-white hover:bg-[black] custom-date"
+              className="border  rounded-[10px] px-2 py-1 bg-[#00B290] text-white hover:bg-[black] custom-date"
               value={item.date}
               onChange={(e) => handleChange(index, "date", e.target.value)}
             />
 
 
             <X
-              size={20}
-              className="text-black cursor-pointer hover:text-black"
+              size={24}
+              className="text-black cursor-pointer hover:text-black "
               onClick={() => handleRemove(index)}
             />
           </div>
