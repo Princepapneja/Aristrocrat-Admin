@@ -147,7 +147,6 @@ console.log(data);
                 };
 
                 try {
-debugger
 
                  const resp=   await axios.put(data?.data?.uploadUrl, file, config);
                     console.log(resp,"s3 resp")

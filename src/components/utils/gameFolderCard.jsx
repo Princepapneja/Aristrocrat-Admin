@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Plus, SquareArrowOutUpRight, X, File } from "lucide-react";
+import { Plus, SquareArrowOutUpRight, X, File, ChevronRight } from "lucide-react";
 import folderImg from "../../assets/adminAssets/folder.png";
 import InputField from "./InputFields";
 import apiHandler from "../../functions/apiHandler";
@@ -7,7 +7,7 @@ import apiHandler from "../../functions/apiHandler";
 const GameFolderCard = React.memo(({ type, subFolderFile, handleFileChange, onSelectionChange, selectedFolder, folders, setSelectedFolder, gameId, files, fetchFolders, setShowPopup, showPopup, addNewFolder, handleInput, uploadedFolders }) => {
   const [selectedFoldersPre, setSelectedFoldersPre] = useState([]);
   const [open, setOpen] = useState(false)
-
+const [menuItems,setMenuItems]=useState([])
 
   // const toggleFolderSelection = (folderName) => {
   //   const updated = selectedFoldersPre.includes(folderName)
@@ -22,8 +22,14 @@ const GameFolderCard = React.memo(({ type, subFolderFile, handleFileChange, onSe
   // };
   console.log(files);
   console.log(folders);
-  console.log(selectedFolder);
 
+  const handleSelectedFolder=(folder)=>{
+    console.log(folder.name);
+    
+    setSelectedFolder(folder)
+    setMenuItems(prevItems => [...prevItems, folder?.name]);
+
+  }
 
   const file = uploadedFolders.length > 0 ? uploadedFolders : files;
 
@@ -33,7 +39,25 @@ const GameFolderCard = React.memo(({ type, subFolderFile, handleFileChange, onSe
       {
         selectedFolder ?
           <div>
-            <p>selected folder:- {selectedFolder?.name}</p>
+           <div className="text-sm text-gray-600 mt-8" aria-label="Breadcrumb">
+      <ol className="flex items-center space-x-1 md:space-x-3">
+        {menuItems.length >0 && menuItems?.map((item, index) => {
+          console.log(item);
+          
+          return(
+          <li key={index} className="inline-flex items-center cursor-pointer">
+            {index !== 0 && (
+              <ChevronRight className="w-4 h-4 mx-1 text-gray-400" />
+            )}
+            <span
+             
+            >
+              {item}
+            </span>
+          </li>
+        )})}
+      </ol>
+    </div>
 
             <>
 
@@ -57,7 +81,7 @@ const GameFolderCard = React.memo(({ type, subFolderFile, handleFileChange, onSe
                     </span>
 
                     <div className="flex flex-col items-center w-full cursor-pointer" onClick={() => {
-                      setSelectedFolder(folder)
+                      handleSelectedFolder(folder)
                     }}>
                       <img src={folderImg} alt="Folder" className="w-20 h-20 mb-2" />
                       <span className="text-[16px] font-[600] text-center break-words w-full">
@@ -172,7 +196,7 @@ const GameFolderCard = React.memo(({ type, subFolderFile, handleFileChange, onSe
                     </span>
 
                     <div className="flex flex-col items-center w-full cursor-pointer" onClick={() => {
-                      setSelectedFolder(folder)
+                      handleSelectedFolder(folder)
                     }}>
                       <img src={folderImg} alt="Folder" className="w-20 h-20 mb-2" />
                       <span className="text-[16px] font-[600] text-center break-words w-full">
