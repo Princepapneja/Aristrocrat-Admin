@@ -1,10 +1,13 @@
 import React, { useState } from "react";
 import InputField from "./InputFields";
 import StudioDropdown from "./studio";
+import { useNavigate } from "react-router-dom";
+import moment from "moment";
 
 const ListingTabel = ({ games, handleRowClick,companyList,handleLoadMore ,files}) => {
     
   console.log(files);
+  const navigate =useNavigate()
   
   return (
     <>
@@ -42,26 +45,26 @@ const ListingTabel = ({ games, handleRowClick,companyList,handleLoadMore ,files}
             </tr>
           </thead>
           <tbody>
-            {files?.map((game, index) => (
+            {files?.map((game, index) =>(
               <tr
                 key={index}
-                onClick={() => handleRowClick(game?.id)}
+                onClick={() => navigate(`/dashboard/games/files/${game?.id}?&studioId=${game?.studioId}`)}
                 className="group cursor-pointer text-xl border-b border-gray-200 transition"
               >
                 <td className="py-5 text-base font-medium text-[#6F6F6F] group-hover:text-black ">
-                  {game?.game?.title}
+                  {game?.title}
                 </td>
                 <td className="py-5 text-base font-medium text-[#6F6F6F] group-hover:text-black">
                   {game?.studio?.name}
                 </td>
                 <td className="py-5 text-base font-medium text-[#6F6F6F] group-hover:text-black">
-                  Company Name
+                  {game?.subStudio?.name}
                 </td>
-                <td className="py-5 text-base font-medium vtext-[#6F6F6F] group-hover:text-black">
+                <td className="py-5 capitalize text-base font-medium text-[#6F6F6F] group-hover:text-black">
                   {game.status}
                 </td>
                 <td className="py-5  text-base font-medium text-[#6F6F6F] group-hover:text-black">
-                  {game?.releaseDate}
+                  {game?.releaseDate ? moment(game?.releaseDate).format("DD MMM, YYYY") : "N/A"}
                 </td>
               </tr>
             ))}

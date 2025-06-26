@@ -17,6 +17,7 @@ const RootLayout = () => {
   const [render, setRender] = useState(false)
   const [progress, setProgress] = useState(0);
   const [user, setUser] = useState(null);
+  const [studio, setStudio] = useState(null);
   const [mainLoader, setMainLoader] = useState(false)
   const success = (msg) => toast.success(msg, {
     position: "top-center",
@@ -88,7 +89,7 @@ const RootLayout = () => {
         <Loader />
       }
       <main className="">
-        <Outlet context={{ disable, setDisable, availableQuestions, setAvailableQuestions, mainLoader, setMainLoader, user, counts, setCounts, navigate, token, setToken, setUser, render, setRender, height, success, error, progress, setProgress, sideBarOpen, setSideBarOpen }} />
+        <Outlet context={{ disable, setDisable, availableQuestions, setAvailableQuestions, mainLoader, setMainLoader, user, counts, setCounts, navigate, token, setToken, setUser, render, setRender, height, success, error, progress, setProgress, sideBarOpen, setSideBarOpen,setStudio,studio }} />
       </main>
       {/* <Footer/> */}
     </>

@@ -70,8 +70,7 @@ const Modal = ({
                 disabled={disableCTA === "firstCta" ? true : false}
                 type='border'
                 spinner={false}
-
-                className={"w-full md:w-[unset]"}
+                className={"w-full md:w-[unset] !py-1"}
                 onClick={async (e) => {
                   try {
                     handleFirstCta && await handleFirstCta(e)
@@ -90,7 +89,7 @@ const Modal = ({
               <Buttons
                 disabled={disableCTA === "secondCta" ? true : false}
                 spinner={false}
-                className={"w-full md:w-[unset]"}
+                className={"w-full md:w-[unset]  !py-1"}
                 type={secondCtaText === "Delete" || secondCtaText === "Block" || secondCtaText === "Yes" ? "danger" : "primary"}
                 onClick={async () => {
                   try {

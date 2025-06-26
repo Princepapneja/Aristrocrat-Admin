@@ -21,7 +21,7 @@ const ActiveButtons = ({ buttons, className, active, setActive, type = 'primary'
   const { active: activeClass, inactive: nonActiveClass,common } = styleMap[type] || styleMap['primary'];
 
   return (
-    <div className={`${className} flex gap-3 overflow-auto p-2 bg-[#F4F4F4] rounded-2xl`}>
+    <div className={`${className} flex gap-3 overflow-auto p-2  rounded-2xl`}>
       {buttons?.map((button, index) => (
         <button
           key={index}

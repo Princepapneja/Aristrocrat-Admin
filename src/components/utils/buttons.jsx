@@ -19,13 +19,13 @@ const Buttons = ({ type = "primary", children, spinner = false, disabled, big = 
         
         type === 'download'?
         <a href={href}>
-           <div className='flex gap-2.5 bg-primary-dark px-8 py-2.5 rounded-xl items-center'>
+           <div className='flex gap-2.5 bg-primary-dark px-8 py-2.5 rounded-md items-center'>
         <p className='font-semibold text-white '>{name}</p>
         <img className='h-4 w-4' src={"/logos/download.png"} alt="" />
     </div>
           {children}
         </a>
-        : <button disabled={disabled} onClick={handleClick} className={` relative rounded-xl  py-2.5 px-8 ${type === "border" ? "text-primary-dark  border border-primary-dark border-solid disabled:opacity-70 disabled:text-desc" : type === "danger" ? "bg-red-500 text-white" : "bg-primary-dark text-white"} select-none $ disabled:opacity-50 font-semibold ${className}`}>
+        : <button disabled={disabled} onClick={handleClick} className={` relative rounded-lg  py-2.5 px-8 ${type === "border" ? "text-primary-dark  border border-primary-dark border-solid disabled:opacity-70 disabled:text-desc" : type === "danger" ? "bg-red-500 text-white" : "bg-primary-dark text-white"} select-none $ disabled:opacity-50 font-semibold ${className}`}>
         {
           spinner &&
           <span className="absolute left-2 top-3">

@@ -111,7 +111,7 @@ const handleSubmit =async(id,access)=>{
             <div className=" mb-8 mt-10">
               <ActiveButtons
                 active={active}
-                className={"grid grid-cols-2 gap-4"}
+                className={"grid grid-cols-2 gap-4 bg-[#F4F4F4]"}
                 setActive={setActive}
                 buttons={activeButtons}
               />

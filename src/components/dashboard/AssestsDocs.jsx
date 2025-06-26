@@ -10,6 +10,7 @@ import ForlderCard from "../utils/forlderCard";
 import moment from "moment";
 import { dateFormat } from "../../../constants";
 import StudioDropdown from "../utils/studio";
+import { useNavigate } from "react-router-dom";
 function AssestsDocs() {
 
 
@@ -18,7 +19,7 @@ function AssestsDocs() {
   const [companyList,setCompanyList]=useState([])
   const [masterList,setMasterList]=useState([])
   
-
+const navigate =useNavigate()
   const fetchCompany = async () => {
     try {
       const { data } = await apiHandler.get(`/companies`);
@@ -70,6 +71,9 @@ const fetchMasterList=async ()=>{
   }, []);
 
   const handleRowClick = (game) => {
+    console.log(game);
+    navigate()
+    
     // alert(`Clicked on: ${game.name}`);
   };
 const folders = [
@@ -98,12 +102,13 @@ const [loading, setLoading] = useState(false);
 
 const fetchFiles = async () => {
   setLoading(true);
+  debugger
   try {
     const query = new URLSearchParams(filters).toString();
-    const { data } = await apiHandler.get(`/files?${query}`);
+    const { data } = await apiHandler.get(`/games?${query}`);
     console.log(data);
     
-    const newFiles = data?.data?.resp || [];
+    const newFiles = data?.data?.games || [];
 
     setFiles((prev) => (filters.skip === 0 ? newFiles : [...prev, ...newFiles]));
     setHasMore((filters.skip + filters.limit) < data?.data?.total);
@@ -131,7 +136,7 @@ const handleLoadMore = () => {
             <div className=" mb-8 mt-10">
               <ActiveButtons
                 active={activeStudio}
-                className={"grid grid-cols-2 gap-4"}
+                className={"grid grid-cols-2 gap-4 bg-[#F4F4F4]"}
                 setActive={setActiveStudio}
                 buttons={activeButtons}
               />

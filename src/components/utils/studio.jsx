@@ -5,8 +5,8 @@ import { X,Plus } from 'lucide-react';
 import InputField from './InputFields';
 
 
-export default function StudioDropdown({ label, showBtn ,options,onChange,name,addExclusivity,createCategory,handleCreate}) {
-
+export default function StudioDropdown({ label, showBtn ,preSelected ,options,onChange,name,addExclusivity,createCategory,handleCreate}) {
+console.log(preSelected,"preSelected")
   
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -32,7 +32,10 @@ const handleCheck = (studio) => {
     onChange({ target: { name:name, value: studio } });
   }
 };
-
+useEffect(()=>{
+  if(!preSelected) return
+setSelected(preSelected)
+},[preSelected])
 
   
 const handleClearAll = () => {
@@ -91,7 +94,7 @@ studioName.toLowerCase().includes(searchTerm.toLowerCase())
      
 
       {open && (
-        <div className={`absolute mt-2  bg-white shadow-lg rounded-md border border-gray-200 z-50 p-4 ${addExclusivity? "w-[260px]  right-3":"w-full"} `} >
+        <div className={`absolute mt-2  bg-white shadow-lg rounded-md border border-gray-200 z-50 p-4 ${addExclusivity? "w-[260px] right-0":"w-full"} `} >
           {/* <div className='flex items-baseline justify-between'>
               <h2 className="text-lg font-semibold mb-4">Add {label}</h2>
               <X
@@ -114,17 +117,21 @@ studioName.toLowerCase().includes(searchTerm.toLowerCase())
 
 
           <div className="max-h-48 overflow-y-auto px-3 py-2 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
-            {filteredStudios?.map((studio, index) => (
-              <label key={studio.id} className="flex items-center space-x-2 py-1">
+            {filteredStudios?.map((studio, index) => {
+              console.log(selected.includes(studio.id),studio,selected ,preSelected,"bv");
+              const checked =  selected.includes(studio.id)
+              return( 
+                 <label key={studio.id} className="flex items-center space-x-2 py-1">
                 <input
                   type="checkbox"
-                  checked={selected.includes(studio.id)}
+                  checked={checked}
                   onChange={() => handleCheck(studio.id)}
                   className="accent-green-600"
                 />
                 <span className="text-sm text-gray-800">{studio?.name || studio?.title}</span>
               </label>
-            ))}
+              )
+            })}
             {filteredStudios?.length === 0 && (
               <div className="text-sm text-gray-500 text-center py-2">
                 No results found
@@ -132,8 +139,7 @@ studioName.toLowerCase().includes(searchTerm.toLowerCase())
             )}
           </div>
 
- {
-        !addExclusivity &&(
+
 
    <div className="flex justify-between items-center px-3 py-2">
             <button
@@ -150,12 +156,7 @@ studioName.toLowerCase().includes(searchTerm.toLowerCase())
             </button>
           </div>
 
-        )
-        
-        
-        
-        
-        }
+       
        
         </div>
       )}

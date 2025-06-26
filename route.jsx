@@ -5,19 +5,16 @@ import Login from './src/pages/login';
 import Certificates from './src/components/dashboard/certificates';
 import MasterGame from './src/components/dashboard/MasterGame';
 import ContactUs from './src/components/dashboard/ContactUs';
-import Roadmaps from './src/components/dashboard/Roadmaps';
 import GamePage from './src/components/dashboard/GamePage';
-import EngagementTools from './src/components/dashboard/EngagementTools';
 import Homepage from './src/components/dashboard/Homepage';
 import DetailGame from './src/components/dashboard/DetailGame';
 import FolderUploader from './src/components/dashboard/fileUploader';
-import AristocratInteractive from './src/components/dashboard/AristocratInteractive';
-import AristocratInterPublish from './src/components/dashboard/AristocratInterPublish';
 import AssetsDocument from './src/components/dashboard/AssestsDocs';
 import Users from './src/components/dashboard/Users';
-import SignUp from './src/pages/SignUp';
 import ForgotPassword from './src/pages/ForgotPassword';
 import ProtectedRoute from './src/components/auth/ProtectedRoute';
+import GameFilesUpload from './src/components/dashboard/GameFilesUpload';
+import GameForm from './src/components/dashboard/GameForm';
 const Route = () => {
     const router = createBrowserRouter([
         {
@@ -68,12 +65,13 @@ const Route = () => {
                                     element:<ProtectedRoute><GamePage/></ProtectedRoute>
                                 },
                                 {
-                                    path:'/dashboard/add-games/:id',
-                                    element:<ProtectedRoute><AristocratInteractive/></ProtectedRoute>
+                                    path:'/dashboard/games/game-form',
+                                    element:<ProtectedRoute><GameForm/></ProtectedRoute>
                                 },
+                               
                                  {
-                                    path:'/dashboard/games/aristocrat-interactive/aristocrat-interactive-publish/:id',
-                                    element:<ProtectedRoute><AristocratInterPublish/></ProtectedRoute>
+                                    path:'/dashboard/games/files/:id',
+                                    element:<ProtectedRoute><GameFilesUpload/></ProtectedRoute>
                                 },
                                 {
                                     path:'/dashboard/users',

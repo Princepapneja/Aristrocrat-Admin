@@ -6,13 +6,12 @@ import apiHandler from '../../functions/apiHandler';
 import cross from '/logos/cross.png';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import Buttons from '../utils/buttons';
-import cardImg from '../../assets/adminAssets/_fortineSM_story_size_1080x1920.png'
-import pencil from '../../assets/adminAssets/pencil--change-edit-modify-pencil-write-writing.png'
 import arrow from '../../assets/adminAssets/arrow-bend-left.png'
 import { Pen } from "lucide-react";
 import { Plus, X } from 'lucide-react';
 import '../../../src/mainStyle.css'
 import { ChevronUp } from "lucide-react";
+import useGlobal from '../../hooks/useGlobal';
 
 function GamePage() {
   const [params] = useSearchParams()
@@ -25,15 +24,12 @@ function GamePage() {
   const [totalGames, setTotalGames] = useState(0);
   const [showDropdown, setShowDropdown] = useState(false);
   const [studioName, setStudioName] = useState([])
-const [hoveredCardIndex, setHoveredCardIndex] = useState(null);
+  const [hoveredCardIndex, setHoveredCardIndex] = useState(null);
   const toggleDropdown = () => setShowDropdown(prev => !prev);
-
-
   const dropdownDefaults = (label) => [
     { value: label, selected: true, name: label }
   ];
   const [studios, setStudios] = useState([])
-
   const [dropdowns, setDropdowns] = useState({
     regionOption: dropdownDefaults('Region'),
     volatilityOption: dropdownDefaults('Volatility'),
@@ -44,7 +40,7 @@ const [hoveredCardIndex, setHoveredCardIndex] = useState(null);
     jackpotOption: dropdownDefaults('Jackpot'),
   });
 
-
+const {success}= useGlobal()
   useEffect(() => {
     fetchGames();
   }, [filters]);
@@ -105,11 +101,7 @@ const [hoveredCardIndex, setHoveredCardIndex] = useState(null);
     setLoading(true);
     try {
       const queryParams = new URLSearchParams(filters).toString();
-      //console.log(queryParams);
-      
       const { data } = await apiHandler.get(`games?${queryParams}`);
-      //console.log(data);
-      
       const newGames = data.data.games || [];
       setGames((prev) => (filters.skip === 0 ? newGames : [...prev, ...newGames]));
       setHasMore((filters.skip + filters.limit) < data.data.total);
@@ -120,8 +112,7 @@ const [hoveredCardIndex, setHoveredCardIndex] = useState(null);
     setLoading(false);
   };
 
-  // //console.log(games);
-  
+
   const onFilterChange = (e) => {
     debugger
     const updatedFilters = { ...filters, [e.target.name]: e.target.value, skip: 0 };
@@ -147,8 +138,10 @@ const [hoveredCardIndex, setHoveredCardIndex] = useState(null);
 
   const navigate = useNavigate()
 
-  const handleNavigate = (path) => {
+  const handleNavigate = (item) => {
     setShowDropdown(false);
+    let path = `/dashboard/games/game-form?name=${item?.name}&studioId=${item?.id}`
+    path += `&direct=${item.direct}`
     navigate(path);
   };
 
@@ -158,9 +151,7 @@ const [hoveredCardIndex, setHoveredCardIndex] = useState(null);
       // //console.log(data);
 
       const newstudio = data?.data || [];
-      //console.log(newstudio);
       setStudioName(newstudio)
-
       // setGames((prev) => (filters.skip === 0 ? newGames : [...prev, ...newGames]));
       // setHasMore((filters.skip + filters.limit) < data.data.total);
       // setTotalGames(data.data.total);
@@ -172,13 +163,18 @@ const [hoveredCardIndex, setHoveredCardIndex] = useState(null);
     fetchStudio()
   }, [])
 
+ const handleGameDelete =async (id)=>{
+    try {
+      debugger
 
-  const dateFormate =(date)=>{
- return new Date(date).toLocaleDateString('en-GB', {
-  day: '2-digit',
-  month: 'long',
-})
-  }
+      await apiHandler.delete(`delete-entry/game/${id}`)
+      success("Game is Deleted succesfullyx")
+      await fetchGames()
+    } catch (error) {
+      console.log(error)
+    }
+  } 
+  
   return (
 
 
@@ -188,10 +184,7 @@ const [hoveredCardIndex, setHoveredCardIndex] = useState(null);
       <div className="flex flex-col relative py-10 gap-4">
         <div className="flex gap-10 items-center">
 
-          <Buttons className='flex gap-15 justify-between items-center hover:bg-[black] cursor-pointer rounded-[10px] text-[16px]' onClick={toggleDropdown}>Add New Game <span className='text-lg'> {showDropdown ? <X size={20} /> : <Plus size={20} />}</span></Buttons>
-
-
-
+          <Buttons className='flex gap-15 justify-between items-center hover:bg-black cursor-pointer rounded-[10px] text-[16px]' onClick={toggleDropdown}>Add New Game <span className='text-lg'> {showDropdown ? <X size={20} /> : <Plus size={20} />}</span></Buttons>
           <div className="flex gap-2 grow items-center rounded-[10px] border-[1px] border-[#A8A8A8] py-2 px-4 ">
             <img className="h-3.5 w-3.5" src="/logos/Search.png" alt="Search" />
             <input type="text" className="outline-none bg-transparent text-[#A8A8A8] text-[16px]" placeholder="Keyword" />
@@ -205,7 +198,7 @@ const [hoveredCardIndex, setHoveredCardIndex] = useState(null);
                 studioName.map((item, index) => {
 
                   return (
-                    <li key={item.id} onClick={() => handleNavigate(`/dashboard/add-games/${item?.id}?name=${item?.name}`)} className="hover:text-[#00B290] px-5 py-2 mb-0 rounded cursor-pointer">{item.name}</li>
+                    <li key={item.id} onClick={() => handleNavigate(item)} className="hover:text-[#00B290] px-5 py-2 mb-0 rounded cursor-pointer">{item.name}</li>
 
                   )
                 })
@@ -283,70 +276,14 @@ const [hoveredCardIndex, setHoveredCardIndex] = useState(null);
 
       <div className="grid grid-cols-4 gap-8 mt-10">
 
-     {games.map((game, index) => 
-     
-     (
-  <div key={game.id} className="max-w-[280px] rounded-xl  shadow bg-white relative">
-    <div className="relative">
-      <img
-        src={cardImg}
-        alt="Game Poster"
-        className="w-full h-[300px] object-cover rounded-t-xl"
-      />
-       <div
-      className="absolute top-3 left-3 text-black px-3 py-2 text-xs font-semibold rounded-[10px]"
-      style={{
-        background: "linear-gradient(86.08deg, #66FFCC 0%, #94FF80 100%)",
-      }}
-    >
-        {dateFormate(game?.releaseDate)}
-    </div>
+        {games.map((game, index) =>
 
-      {hoveredCardIndex === index &&  (
-        <div className="absolute top-[-30px] right-0 z-10">
-          <div className="bg-black text-white text-xs rounded px-2 py-1 shadow">
-            Saved for Draft Review
-          </div>
+        (
+        <div>
+          <GameCard handleGameDelete={handleGameDelete}  game={game} key={index} setHoveredCardIndex={setHoveredCardIndex} hoveredCardIndex={hoveredCardIndex} index={index} />
         </div>
-      )}
+        ))}
 
-  {game?.status ==="draft"?
-<div>
-                <div className="absolute top-3 right-3  bg-[#F4405A] p-1.5 rounded-full shadow text-white">
-                <span className='w-[15px] h-[15px] px-1 py-2'  onMouseEnter={() => setHoveredCardIndex(index)}
-          onMouseLeave={() => setHoveredCardIndex(null)}>PP</span>
-
-                </div>
-              </div>:
-             <div className="absolute top-3 right-3">
-        <button
-          className="bg-[#F4405A] p-2 rounded-full shadow relative"
-          onMouseEnter={() => setHoveredCardIndex(index)}
-          onMouseLeave={() => setHoveredCardIndex(null)}
-        >
-          <img src={pencil} alt="Edit" />
-        </button>
-      </div>
-              }
-                
-    </div>
-
-   <div className="p-4 bg-[#F4F4F4] rounded-b-[20px]">
-            <h3 className="font-bold text-xl leading-tight text-black mt-5">{game?.title}</h3>
-            <p className="text-base mt-4 font-normal">By: {game?.studio?.name}</p>
-
-            <div className="flex justify-between gap-2 mt-4 mb-4">
-              <button className="bg-[#00B290] hover:bg-[black] text-white text-sm font-semibold py-1.5 px-10 rounded-[10px] cursor-pointer">
-                Edit
-              </button>
-              <button className="bg-white hover:text-black hover:border-black border border-[#A8A8A8] text-gray-700 text-sm font-semibold py-1.5 px-10 rounded-[10px] cursor-pointer">
-                Delete
-              </button>
-            </div>
-          </div>
-  </div>
-))}
-        
       </div>
 
 
