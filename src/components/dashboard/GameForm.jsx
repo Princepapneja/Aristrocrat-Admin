@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Plus, Calendar } from "lucide-react";
+import { Plus, Calendar, Delete, Trash } from "lucide-react";
 import Studio from '../utils/studio'
 import { Upload } from "lucide-react";
 import InputField from "../utils/InputFields";
@@ -9,13 +9,10 @@ import { Minus } from 'lucide-react';
 import { Send } from 'lucide-react';
 import { Pen } from 'lucide-react';
 import { MoveRight } from 'lucide-react';
-
 import { ChevronUp } from "lucide-react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import apiHandler from "../../functions/apiHandler";
 import useGlobal from "../../hooks/useGlobal";
-
-
 
 
 const GameForm = () => {
@@ -268,9 +265,7 @@ const GameForm = () => {
 
   const handleFileUpload = (e, name) => {
     const file = e.target.files[0];
-
     if (!file) return;
-
     setFormData((prev) => ({
       ...prev,
       [name]: file,
@@ -539,49 +534,79 @@ const GameForm = () => {
             </div>
 
 
-            <div className="grid grid-cols-2 gap-6 mt-12">
+            <div className="grid  gap-6 mt-12">
               {[
-                "Upload Thumbnail Game Page",
-                "Upload Thumbnail Portrait",
-                "Upload Logo Icon",
-                "Upload Screenshots",
-                "Upload Character Images",
-                "Choose Platform Icon",
-              ].map((text, idx) => {
-                const name = text.toLowerCase().replace(/\s+/g, "_");
-                const inputId = `fileInput-${idx}`;
+                {
+                  label: "Thumbnail Game page",
+                  placeholder: "Upload Thumbnail Game Page",
+                  name: "thumbnail",
+                },
+                {
+                  label: "Thumbnail",
+                  placeholder: "Upload Thumbnail Portrait",
+                  name: "portrait",
+                },
+                {
+                  label: "Logo",
+                  placeholder: "Upload Logo Icon",
+                  name: "logo",
+                },
+
+              ].map((item, idx) => {
+                const name = item.name;
                 return (
                   <div key={idx} className="w-full">
                     <input
                       type="file"
-                      id={inputId}
+                      id={item?.name}
                       accept="image/*"
                       className="hidden"
-                      onChange={(e) => handleFileUpload(e, name)}
+                      onChange={(e) => handleFileUpload(e, item.name)}
                       name={name}
-                      multiple
 
                     />
-
-                    <button
-                      className="w-full bg-[#94FF80] hover:bg-black  hover:text-white text-black text-base font-medium py-2 px-4 rounded-[10px] flex items-center justify-between cursor-pointer"
-                      onClick={() => document.getElementById(`${inputId}`).click()}
-                    >
-                      {text}
-
-                      <span className="ml-2"><Upload size={20} /></span>
-
-                    </button>
-
-
-
+                    <div className="w-full bg-[#94FF80] hover:bg-black flex items-center justify-between gap-2  hover:text-white text-black text-base font-medium  rounded-[10px]  cursor-pointer">
+                      <label className="py-2 px-4 w-full flex items-center whitespace-nowrap justify-between" htmlFor={item.name}
+                      >
+                        {formData?.[name]?.fileName || item?.placeholder}
+                        <span className="ml-2"><Upload size={20} /></span>
+                      </label>
+                    </div>
                   </div>
-
-
                 )
               })}
             </div>
+            <div>
+              <div className="w-full mt-12">
+                <input
+                  type="file"
+                  id={"screenshots"}
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => handleFileUpload(e, "screenshots")}
+                  name={"screenshots"}
 
+                />
+                <div className="w-full bg-[#94FF80] hover:bg-black flex items-center justify-between gap-2  hover:text-white text-black text-base font-medium  rounded-[10px]  cursor-pointer">
+
+                  <label className="py-2 px-4  w-full flex items-center whitespace-nowrap justify-between" htmlFor={"screenshots"}
+
+                  >
+                    Upload Screenshots
+                    <span className="ml-2"><Upload size={20} /></span>
+
+                  </label>
+
+
+
+
+                </div>
+                <div>
+                  prince
+                </div>
+              </div>
+
+            </div>
           </div>}
         </div>
 
