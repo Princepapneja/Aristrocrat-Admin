@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";More actions
 import { Plus, Calendar, Delete, Trash } from "lucide-react";
 import Studio from '../utils/studio'
 import { Upload } from "lucide-react";
@@ -273,6 +273,7 @@ const handleFileUpload = (e) => {
     setFormData((prev) => ({
       ...prev,
       [name]: [...(prev?.[name] || []), ...files], 
+
     }));
   } else {
     setFormData((prev) => ({
@@ -499,8 +500,8 @@ console.log(value);
 
 
   const handleAddMore = () => {
-    const nextIndex = variationColumns.length + 5;
-    setExtraRows(prev => [...prev, {r:"R"}]);
+    const nextIndex = extraRows.length + 5;
+    setExtraRows(prev => [...prev, nextIndex]);
   };
 
     const [showFilterModal, setShowFilterModal] = useState(false);
@@ -593,6 +594,7 @@ const removeScreenshot = (indexToRemove) => {
                       className="hidden"
                       onChange={handleFileUpload}
 
+
                     />
                     <div className="w-full bg-[#94FF80] hover:bg-black flex items-center justify-between gap-2  hover:text-white text-black text-base font-medium  rounded-[10px]  cursor-pointer">
                       <label className="py-2 px-4 w-full flex items-center whitespace-nowrap justify-between" htmlFor={item.name}
@@ -636,6 +638,8 @@ const removeScreenshot = (indexToRemove) => {
 
                 </div>
              
+
+
               </div>
 
             
@@ -741,23 +745,23 @@ const removeScreenshot = (indexToRemove) => {
             </div>
 
             <div className="space-y-4 grid grid-cols-2 md:grid-cols-8 gap-4 text-center text-sm font-semibold mb-2 mt-10">
-              {variationColumns?.map((rowNum, i) => {
+              {extraRows.map((rowNum, i) => {
 
                 return (
                   <div key={i} className="flex flex-col space-y-1">
                     <InputField
-                      key={i}
-                      id={ `Variation ${i+1} USA`}
+                      key={rowNum}
+                      id={rowNum > 8 ? `Variation ${rowNum} USA` : `Variation ${rowNum}`}
                       type="text"
-                      label={`Variation ${i+1} USA`}
+                      label={rowNum > 8 ? `Variation ${rowNum} USA` : `Variation ${rowNum}`}
                       handleInputChange={getIpData}
 
                     />
                     <InputField
                       key={i}
-                      id={ `RTP ${i+1} USA`}
+                      id={rowNum > 8 ? `RTP ${rowNum} USA` : `RTP ${rowNum}`}
                       type="text"
-                      label={`RTP ${i+1} USA`}
+                      label={rowNum > 8 ? `RTP ${rowNum} USA` : `RTP ${rowNum}`}
                       handleInputChange={getIpData}
                     />
                   </div>
