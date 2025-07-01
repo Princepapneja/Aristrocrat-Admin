@@ -162,7 +162,7 @@ const GameForm = () => {
 
   const fetchRegions = async () => {
     try {
-      const { data } = await apiHandler.get(`/regions`);
+      const { data } = await apiHandler.get(`/countries`);
       //console.log(data);
       setCountries(data?.data)
 
@@ -310,8 +310,8 @@ const handleFileUpload = (e) => {
         ...formData,
         status,
       };
-
       console.log(finalData);
+      debugger
       let resp = null
       if (gameId) {
         const { data } = await apiHandler.patch(`/game/${gameId}`, finalData)
