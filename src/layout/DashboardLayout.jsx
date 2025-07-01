@@ -25,28 +25,11 @@ const DashboardLayout = () => {
     // navigate("/dashboard")
   }
 
-  const automation = async () => {
-    const { data } = await apiHandler.patch("/automation")
-  }
-
-  const fetchCounts = async () => {
-    try {
-      const currentYear = new Date().getFullYear();
-      const { data } = await apiHandler.get(`counts/${currentYear}`);
-      setCounts(data.data);
-    } catch (error) {
-      console.error("Error fetching counts:", error);
-    }
-  }
-
-  useEffect(() => {
-    automation()
-  }, [])
+  
 
   useEffect(() => {
     if (!token) return;
     fetchDetails()
-    fetchCounts()
   }, [token, render])
 
 

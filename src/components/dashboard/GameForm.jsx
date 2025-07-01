@@ -488,8 +488,8 @@ const GameForm = () => {
 
 
   const handleAddMore = () => {
-    const nextIndex = extraRows.length + 5;
-    setExtraRows(prev => [...prev, nextIndex]);
+    const nextIndex = variationColumns.length + 5;
+    setExtraRows(prev => [...prev, {r:"R"}]);
   };
 
 
@@ -657,23 +657,23 @@ const GameForm = () => {
             </div>
 
             <div className="space-y-4 grid grid-cols-2 md:grid-cols-8 gap-4 text-center text-sm font-semibold mb-2 mt-10">
-              {extraRows.map((rowNum, i) => {
+              {variationColumns?.map((rowNum, i) => {
 
                 return (
                   <div key={i} className="flex flex-col space-y-1">
                     <InputField
-                      key={rowNum}
-                      id={rowNum > 8 ? `Variation ${rowNum} USA` : `Variation ${rowNum}`}
+                      key={i}
+                      id={ `Variation ${i+1} USA`}
                       type="text"
-                      label={rowNum > 8 ? `Variation ${rowNum} USA` : `Variation ${rowNum}`}
+                      label={`Variation ${i+1} USA`}
                       handleInputChange={getIpData}
 
                     />
                     <InputField
                       key={i}
-                      id={rowNum > 8 ? `RTP ${rowNum} USA` : `RTP ${rowNum}`}
+                      id={ `RTP ${i+1} USA`}
                       type="text"
-                      label={rowNum > 8 ? `RTP ${rowNum} USA` : `RTP ${rowNum}`}
+                      label={`RTP ${i+1} USA`}
                       handleInputChange={getIpData}
                     />
                   </div>
