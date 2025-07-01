@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";More actions
+import React, { useEffect, useState } from "react";
 import { Plus, Calendar, Delete, Trash } from "lucide-react";
 import Studio from '../utils/studio'
 import { Upload } from "lucide-react";
@@ -89,7 +89,7 @@ const GameForm = () => {
 
     setDates(updatedDates);
 
-    const regionalReleaseDates = updatedDates.reduce((acc, item) => {
+    const countryReleaseDates = updatedDates.reduce((acc, item) => {
       console.log(item);
       
 
@@ -103,7 +103,7 @@ const GameForm = () => {
 
     setFormData((prev) => ({
       ...prev,
-      regionalReleaseDates
+      countryReleaseDates
     }));
   };
 
@@ -119,7 +119,7 @@ const GameForm = () => {
     updatedDates.splice(index, 1);
     setDates(updatedDates);
 
-    const regionalReleaseDates = updatedDates.reduce((acc, item) => {
+    const countryReleaseDates = updatedDates.reduce((acc, item) => {
       if (item.id && item.date) {
         acc[item.id] = new Date(item.date).toISOString();
       }
@@ -129,7 +129,7 @@ const GameForm = () => {
 
     setFormData((prev) => ({
       ...prev,
-      regionalReleaseDates
+      countryReleaseDates
     }));
   };
 
