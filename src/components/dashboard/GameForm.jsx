@@ -273,6 +273,7 @@ const handleFileUpload = (e) => {
     setFormData((prev) => ({
       ...prev,
       [name]: [...(prev?.[name] || []), ...files], 
+
     }));
   } else {
     setFormData((prev) => ({
@@ -593,6 +594,7 @@ const removeScreenshot = (indexToRemove) => {
                       className="hidden"
                       onChange={handleFileUpload}
 
+
                     />
                     <div className="w-full bg-[#94FF80] hover:bg-black flex items-center justify-between gap-2  hover:text-white text-black text-base font-medium  rounded-[10px]  cursor-pointer">
                       <label className="py-2 px-4 w-full flex items-center whitespace-nowrap justify-between" htmlFor={item.name}
@@ -636,6 +638,8 @@ const removeScreenshot = (indexToRemove) => {
 
                 </div>
              
+
+
               </div>
 
             
