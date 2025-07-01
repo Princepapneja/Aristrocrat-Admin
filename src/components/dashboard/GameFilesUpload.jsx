@@ -88,7 +88,6 @@ const fetchRootLevels = async () => {
         let url = `games/${param.id}/folders`
         const { data } = await apiHandler.get(url)
         console.log(data);
-        debugger
         setRootLevels(data?.data?.folders || [])
     } catch (error) {
         console.error("Error fetching root levels:", error)

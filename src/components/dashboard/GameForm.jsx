@@ -90,6 +90,8 @@ const GameForm = () => {
     setDates(updatedDates);
 
     const regionalReleaseDates = updatedDates.reduce((acc, item) => {
+      console.log(item);
+      
 
       if (item.id && item.date) {
         acc[item.id] = new Date(item.date).toISOString();
@@ -263,15 +265,22 @@ const GameForm = () => {
     ))
   }
 
-  const handleFileUpload = (e, name) => {
-    const file = e.target.files[0];
-    if (!file) return;
+const handleFileUpload = (e) => {
+  const { name, files, multiple } = e.target;
+  if (!files || files.length === 0) return;
+
+  if (multiple) {
     setFormData((prev) => ({
       ...prev,
-      [name]: file,
-
+      [name]: [...(prev?.[name] || []), ...files], 
     }));
-  };
+  } else {
+    setFormData((prev) => ({
+      ...prev,
+      [name]: files[0],
+    }));
+  }
+};
 
 
   const handleNextClick = async (e) => {
@@ -327,6 +336,7 @@ const GameForm = () => {
 
   const handleCategories = (e, type) => {
 
+console.log(e);
 
     if (e.type === "clearAll") {
       setFormData((prev => ({ ...prev, categoryIds: [] })))
@@ -336,6 +346,7 @@ const GameForm = () => {
 
     const data = [...formData?.categoryIds || []]
     const value = e.target.value
+console.log(value);
 
     if (data.includes(value)) {
       data?.filter((q) => {
@@ -492,6 +503,24 @@ const GameForm = () => {
     setExtraRows(prev => [...prev, nextIndex]);
   };
 
+    const [showFilterModal, setShowFilterModal] = useState(false);
+
+
+const removeScreenshot = (indexToRemove) => {
+  setFormData((prev) => {
+    const updatedScreenshots = prev?.screenshots?.filter((_, index) => index !== indexToRemove);
+
+    if (updatedScreenshots.length === 0) {
+      setShowFilterModal(false);
+    }
+
+    return {
+      ...prev,
+      screenshots: updatedScreenshots,
+    };
+  });
+};
+
 
 
   return (
@@ -526,7 +555,7 @@ const GameForm = () => {
               <label className="block mt-6 mb-2 text-sm font-semibold  leading-[24px] text-[#000000]">Game Description Here</label>
               <textarea
                 className="w-full border-[1px] border-gray-300 rounded-[10px] px-4 py-2 min-h-[200px]  text-[#A8A8A8]"
-                placeholder="GameKeyHere"
+                placeholder="Enter the Game Key"
                 onChange={getIpData}
                 name="description"
                 value={formData?.description}
@@ -559,16 +588,19 @@ const GameForm = () => {
                     <input
                       type="file"
                       id={item?.name}
+                      name={item?.name}
                       accept="image/*"
                       className="hidden"
-                      onChange={(e) => handleFileUpload(e, item.name)}
-                      name={name}
+                      onChange={handleFileUpload}
 
                     />
                     <div className="w-full bg-[#94FF80] hover:bg-black flex items-center justify-between gap-2  hover:text-white text-black text-base font-medium  rounded-[10px]  cursor-pointer">
                       <label className="py-2 px-4 w-full flex items-center whitespace-nowrap justify-between" htmlFor={item.name}
                       >
-                        {formData?.[name]?.fileName || item?.placeholder}
+                        <span className="truncate w-48">
+                          <span className="capitalize">{formData?.[name]?.name && `${name}: `}</span>
+                        {formData?.[name]?.name || item?.placeholder}
+                        </span>
                         <span className="ml-2"><Upload size={20} /></span>
                       </label>
                     </div>
@@ -581,12 +613,14 @@ const GameForm = () => {
                 <input
                   type="file"
                   id={"screenshots"}
+                  name={"screenshots"}
                   accept="image/*"
                   className="hidden"
-                  onChange={(e) => handleFileUpload(e, "screenshots")}
-                  name={"screenshots"}
+                  multiple
+                  onChange={handleFileUpload}
 
                 />
+                
                 <div className="w-full bg-[#94FF80] hover:bg-black flex items-center justify-between gap-2  hover:text-white text-black text-base font-medium  rounded-[10px]  cursor-pointer">
 
                   <label className="py-2 px-4  w-full flex items-center whitespace-nowrap justify-between" htmlFor={"screenshots"}
@@ -601,10 +635,60 @@ const GameForm = () => {
 
 
                 </div>
-                <div>
-                  prince
-                </div>
+             
               </div>
+
+            
+
+             <div className="w-full text-black grid gap-2 mt-2 text-base font-medium rounded-[10px] cursor-pointer overflow-y-auto max-h-40 ">
+
+          {
+             formData?.screenshots?.length >0 && <div className='flex gap-10'>
+                    <div
+                        onClick={() => setShowFilterModal(true)}
+                        className='cursor-pointer font-semibold text-primary-dark flex gap-3.5 items-center bg-white-v2 rounded-xl px-5 py-2.5'
+                    >
+                        <p>View Selected Screenshots</p>
+                        <img className='h-4 w-4' src='/logos/filterArrow.png' alt='' />
+                    </div>
+
+                   
+                </div>
+          }   
+
+
+  { showFilterModal && (
+                <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
+                    <div
+                        className="bg-white rounded-[15px] shadow-lg p-6 w-[25%] h-[60vh] transform transition-all duration-300 translate-y-10 opacity-0 animate-popup"
+                    >
+                        <div className='flex items-baseline justify-end mb-5'>
+                            <X
+                                size={20}
+                                className="text-black cursor-pointer hover:text-black"
+                                onClick={() => setShowFilterModal(false)}
+                            />
+                        </div>
+                        <div className="flex flex-wrap gap-3 max-h-[400px] overflow-y-auto">
+
+                            { formData?.screenshots?.map((file, i) => {
+                             
+
+                                return (
+                                    <div key={i} className='flex items-center gap-3 py-2.5 px-3.5 border-2 border-black-v4 rounded-xl'>
+                                        <p className='text-sm text-black-v3'>{file?.name}</p>
+                                         <button onClick={() => removeScreenshot(i)} ><X size={20} className="text-black-v3 cursor-pointer"/></button>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+
+</div>
+
 
             </div>
           </div>}
@@ -829,11 +913,14 @@ const GameForm = () => {
                   onChange={(e) => handleChange(index, "id", e.target.value)}
                 >
                   <option value="">Choose Country</option>
-                  {countries.map((country) => (
+                  {countries.map((country) => {
+                    
+                    
+                    return(
                     <option key={country.id} value={country.id}>
                       {country.name}
                     </option>
-                  ))}
+                  )})}
                 </select>
 
                 {/* Custom Dropdown Icon */}

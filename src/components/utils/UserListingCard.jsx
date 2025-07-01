@@ -3,7 +3,7 @@ import { Minus ,Check} from "lucide-react";
 import UserImg from '../../assets/adminAssets/Kami Scerri.png'
 
 const UserListingCard = ({ user,handleSubmit }) => {
-  // console.log(user);
+  console.log(user);
   
     
   return (
@@ -46,11 +46,11 @@ const UserListingCard = ({ user,handleSubmit }) => {
       </div>
 
       <div className="flex flex-col gap-3">
-        <button className="bg-[#00B290] w-50 text-white text-sm font-medium py-2 px-5 rounded-[10px] hover:bg-black"  onClick={() => handleSubmit(user?.id, "approved")}>
-          {user?.access === "approved"? "Edit":"Approved"}
+        <button className="bg-[#00B290]  text-white text-sm font-medium py-2 px-5 rounded-[10px] hover:bg-black cursor-pointer"  onClick={() => handleSubmit(user?.id, "approved")}>
+          {user?.access === "approved"? "Edit":"Approve"}
         </button>
-        <button className="bg-[#EF4444] w-50 text-white text-sm font-medium py-2 px-3 rounded-[10px] hover:text-[black] hover:bg-[#F6ADCD]"  onClick={() => handleSubmit(user?.id,`${user?.access === "approved" ? "blocked":"rejected"}`)}>
-          {user?.access === "approved" ? "Block Account":"Reject"}
+        <button className="bg-[#EF4444] text-white text-sm font-medium py-2 px-3 rounded-[10px] hover:text-[black] hover:bg-[#F6ADCD] cursor-pointer"  onClick={() => handleSubmit(user?.id,`${user?.access === "approved" ? "blocked":"rejected"}`)}>
+          {user?.access === "approved" ? "Delete Account":"Deny"}
         </button>
       </div>
     </div>

@@ -12,6 +12,8 @@ const Buttons = ({ type = "primary", children, spinner = false, disabled, big = 
       setLoading(false)
     }, 1000)
   }
+
+  
   return (
     <>
     <div>

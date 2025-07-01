@@ -73,12 +73,12 @@ const Login = () => {
       const { data } = await apiHandler.post("/login", inputValues);
       console.log(data);
       
-      if (data?.data?.admin?.access === "blocked") {
-        navigate("/")
-        error("Your account has been blocked. Please contact us for more information.")
-        return
-      }
-      
+      // if (data?.data?.admin?.access === "blocked") {
+      //   error("Your account has been blocked. Please contact us for more information.")
+      //   navigate("/")
+      //   return
+      // }
+      debugger
       localStorage.setItem("token", data.data.accessToken);
 
 
