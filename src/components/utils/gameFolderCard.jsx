@@ -107,6 +107,7 @@ const GameFolderCard = React.memo(({ options, addExclusivity, setAddExclusivity,
 
   }
 
+console.log(type);
 
   return (
 
@@ -540,7 +541,7 @@ const GameFolderCard = React.memo(({ options, addExclusivity, setAddExclusivity,
             </div>
 
             {
-              type === 38 ? "" : <div className="mt-15 flex justify-center">
+              regionBasedFolders?.length > 0 ? "" : <div className="mt-15 flex justify-center">
                 <input
                   type="file"
                   id="fileInput"
