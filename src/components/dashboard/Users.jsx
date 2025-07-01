@@ -24,6 +24,9 @@ function Users() {
 
   const [companies, setCompanies] = useState([]);
 const [users,setUsers]= useState([])
+const [pendingUsers, setPendingUsers] = useState([]);
+
+
 
 const fetchUsers= async ()=>{
 
@@ -35,10 +38,15 @@ if(filter?.search){
   url+= `&search=${filter?.search}`
 }
   const {data}= await apiHandler.get(url)
-  console.log(data);
-  
-setUsers(data?.data?.resp)
+ const usersData = data?.data?.resp || [];
+
+  if (active === 0) {
+    setUsers(usersData);
+  } else {
+    setPendingUsers(usersData);
+  }
 }
+
   const fetchCompanies = async () => {
     try {
       const { data } = await apiHandler.get(`companies`);
@@ -153,6 +161,8 @@ const handleSubmit =async(id,access)=>{
       </div>
               
 {users?.map((item)=>{
+  console.log(item);
+
   return(
  <UserListingCard user={item} key={item.id} handleSubmit={handleSubmit}/>
 
@@ -173,7 +183,9 @@ const handleSubmit =async(id,access)=>{
               <>
 
               
-{users.map((item)=>{
+{pendingUsers.map((item)=>{
+  console.log(item);
+  
   return(
  <UserListingCard user={item} key={item.id} handleSubmit={handleSubmit}/>
 

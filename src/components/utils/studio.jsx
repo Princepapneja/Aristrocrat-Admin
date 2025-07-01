@@ -5,8 +5,8 @@ import { X,Plus } from 'lucide-react';
 import InputField from './InputFields';
 
 
-export default function StudioDropdown({ label, showBtn ,preSelected ,options,onChange,name,addExclusivity,createCategory,handleCreate}) {
-console.log(preSelected,"preSelected")
+export default function StudioDropdown({ label, showBtn ,preSelected ,options,onChange,name,addExclusivity,createCategory,handleCreate,}) {
+// console.log(preSelected,"preSelected")
   
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -76,10 +76,24 @@ studioName.toLowerCase().includes(searchTerm.toLowerCase())
   },[addExclusivity])
 
   // console.log(filteredStudios);
-  
+    useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside); 
+    };
+  }, []);
+
 
   return (
-    <div ref={dropdownRef} className={`relative w-full ${addExclusivity? "top-[-30px]":""} `}>
+
+
+    <div ref={dropdownRef} className={`relative w-full ${addExclusivity? "top-[-30px]":""}  `}>
       {
         !addExclusivity &&(
            <div
@@ -118,7 +132,7 @@ studioName.toLowerCase().includes(searchTerm.toLowerCase())
 
           <div className="max-h-48 overflow-y-auto px-3 py-2 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
             {filteredStudios?.map((studio, index) => {
-              console.log(selected.includes(studio.id),studio,selected ,preSelected,"bv");
+              // console.log(selected.includes(studio.id),studio,selected ,preSelected,"bv");
               const checked =  selected.includes(studio.id)
               return( 
                  <label key={studio.id} className="flex items-center space-x-2 py-1">

@@ -16,11 +16,10 @@ const DashboardLayout = () => {
   const fetchDetails = async () => {
     const { data } = await apiHandler.get("me")
     //console.log(data);
-    
-    if (data?.data?.access === "blocked") {
-      localStorage.removeItem("token")
-      navigate("/")
-    }
+    // if (data?.data?.access === "blocked") {
+    //   localStorage.removeItem("token")
+    //   navigate("/")
+    // }
     setUser(data.data)
     // navigate("/dashboard")
   }
