@@ -52,7 +52,7 @@ const GameFolderCard = React.memo(({ options, addExclusivity, setAddExclusivity,
 
   const toggleFolderSelection = (item, type) => {
     const key = type === "folder" ? "folderId" : "fileId";
-    console.log(item);
+    // console.log(item);
 
     const exists = selectedFoldersPre.some((entry) => entry[key] === item.id);
 
@@ -65,7 +65,7 @@ const GameFolderCard = React.memo(({ options, addExclusivity, setAddExclusivity,
   };
   // console.log(files);
   // console.log(folders);
-  console.log(selectedFoldersPre);
+  // console.log(selectedFoldersPre);
 
 
   const handleSelectedFolder = (folder) => {
@@ -106,6 +106,8 @@ const GameFolderCard = React.memo(({ options, addExclusivity, setAddExclusivity,
     setShowStudioModal(!showStudioModal)
 
   }
+
+
   return (
 
     <>
@@ -279,32 +281,38 @@ const GameFolderCard = React.memo(({ options, addExclusivity, setAddExclusivity,
 
             </>
           </div> :
-          <div className="bg-white font-sans">
-            <div className=" gap-10">
-              {regionBasedFolders?.length > 0 ? <>
+
+
+
+          <div className=" bg-white font-sans">
+            <div className="  mt-10">
+              {regionBasedFolders?.length > 0 ? 
                 <div>
                   {
                     regionBasedFolders?.map((e, i) => {
-                      return (
-                        <div key={i}>
-                          <div className="flex justify-between items-center">
 
-                            <h3>{e?.region?.name}</h3>
+                      return (
+                        <div key={i} className={`${i === regionBasedFolders.length - 1 ? "" : "border-b-1 border-[#A8A8A8]"} pb-25`}>
+                          <div className="flex justify-between items-center mb-5 mt-10">
+
+                            <h3 className="text-2xl font-semibold leading-6">{e?.region?.name}</h3>
                             <div className="flex  items-center">
-                              <div
+                              {/* <div
                                 className="bg-white flex items-center gap-[10px] p-4 rounded-[10px] mb-5 cursor-pointer"
                                 onClick={() => setShowPopup(true)}
                               >
                                 <span className="text-[#00B290]">Cretate Folder</span>
                                 <Plus className="w-4 h-4 text-white p-0 bg-[#00B290] rounded-full" />
-                              </div>
+                              </div> */}
                               <div className="bg-white flex items-center gap-[10px] p-4 rounded-[10px] mb-5 ml-4 cursor-pointer">
                                 <span className="text-red-500">Delete</span>
                                 <X className="w-4 h-4 text-white p-0 bg-red-500 rounded-full" />
                               </div>
                             </div>
                           </div>
-                          <div>
+
+                          <div className="grid grid-cols-4 gap-10">
+
                             {
                               e?.folders?.map((folder, index) => {
                                 return (
@@ -354,6 +362,25 @@ const GameFolderCard = React.memo(({ options, addExclusivity, setAddExclusivity,
                                 )
                               })
                             }
+
+                          </div>
+
+
+                          <div className="mt-25 flex justify-center">
+                            <input
+                              type="file"
+                              id="fileInput"
+                              className="hidden"
+                              onChange={handleFileChange}
+                              multiple
+                            />
+                            <button
+                              className="flex items-center space-x-2 text-black text-sm font-medium cursor-pointer"
+                              onClick={() => document.getElementById("fileInput").click()}
+                            >
+                              <span>Add More</span>
+                              <Plus size={35} className="border rounded-[5px]" />
+                            </button>
                           </div>
 
                         </div>
@@ -361,10 +388,10 @@ const GameFolderCard = React.memo(({ options, addExclusivity, setAddExclusivity,
                     })
                   }
                 </div>
-              </>
+              
                 :
 
-                <div className="grid grid-cols-4 gap-10">
+               <div className=" grid grid-cols-4 gap-10 mt-10">
                   {
                     folders
                       ?.map((folder, index) => (
@@ -413,10 +440,8 @@ const GameFolderCard = React.memo(({ options, addExclusivity, setAddExclusivity,
                         </div>
                       ))
                   }
-                </div>
-              }
-              <div className="grid grid-cols-4 gap-10 mt-10">
-                {files?.map((folder, index) => (
+
+                  {files?.map((folder, index) => (
                   <div
                     key={index}
                     className="group  relative bg-[#F4F4F4] rounded-[20px] w-[280px] h-[280px] p-4 flex flex-col items-center justify-center hover:shadow hover:bg-white"
@@ -460,7 +485,7 @@ const GameFolderCard = React.memo(({ options, addExclusivity, setAddExclusivity,
                   </div>
                 ))}
 
-              </div>
+              
 
 
               {uploadedFolders?.map((folder, index) => (
@@ -506,24 +531,34 @@ const GameFolderCard = React.memo(({ options, addExclusivity, setAddExclusivity,
                   )}
                 </div>
               ))}
+                </div>
+              }
+
+             
+             
+                
             </div>
 
-            <div className="mt-15 flex justify-center">
-              <input
-                type="file"
-                id="fileInput"
-                className="hidden"
-                onChange={handleFileChange}
-                multiple
-              />
-              <button
-                className="flex items-center space-x-2 text-black text-sm font-medium cursor-pointer"
-                onClick={() => document.getElementById("fileInput").click()}
-              >
-                <span>Add More</span>
-                <Plus size={35} className="border rounded-[5px]" />
-              </button>
-            </div>
+            {
+              type === 38 ? "" : <div className="mt-15 flex justify-center">
+                <input
+                  type="file"
+                  id="fileInput"
+                  className="hidden"
+                  onChange={handleFileChange}
+                  multiple
+                />
+                <button
+                  className="flex items-center space-x-2 text-black text-sm font-medium cursor-pointer"
+                  onClick={() => document.getElementById("fileInput").click()}
+                >
+                  <span>Add More</span>
+                  <Plus size={35} className="border rounded-[5px]" />
+                </button>
+              </div>
+            }
+
+
 
 
           </div>
