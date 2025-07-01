@@ -740,29 +740,68 @@ const removeScreenshot = (indexToRemove) => {
 
             </div>
 
-            <div className="space-y-4 grid grid-cols-2 md:grid-cols-8 gap-4 text-center text-sm font-semibold mb-2 mt-10">
-              {extraRows.map((rowNum, i) => {
+            <div className="space-y-4 grid grid-cols-1 md:grid-cols-2 gap-4 text-center text-sm font-semibold mb-2 mt-10">
 
-                return (
-                  <div key={i} className="flex flex-col space-y-1">
-                    <InputField
+               <div  className="grid grid-cols-4 gap-5">
+
+                {
+                  extraRows.map((rowNum, i)=>{
+                    return(
+                      <div key={i} className="flex flex-col space-y-1">
+
+                       <InputField
                       key={rowNum}
-                      id={rowNum > 8 ? `Variation ${rowNum} USA` : `Variation ${rowNum}`}
+                      id={`Variation ${rowNum}`}
                       type="text"
-                      label={rowNum > 8 ? `Variation ${rowNum} USA` : `Variation ${rowNum}`}
+                      label={`Variation ${rowNum}`}
                       handleInputChange={getIpData}
 
                     />
                     <InputField
                       key={i}
-                      id={rowNum > 8 ? `RTP ${rowNum} USA` : `RTP ${rowNum}`}
+                      id={`RTP ${rowNum}`}
                       type="text"
-                      label={rowNum > 8 ? `RTP ${rowNum} USA` : `RTP ${rowNum}`}
+                      label={`RTP ${rowNum}`}
                       handleInputChange={getIpData}
                     />
+                      </div>
+                    )
+                  })
+                }
+                   
                   </div>
-                )
-              })}
+
+                   <div  className="grid grid-cols-4 gap-5 space-y-1">
+
+                {
+                  extraRows.map((rowNum, i)=>{
+                    return(
+                      <div key={i} className="flex flex-col space-y-1">
+
+                       <InputField
+                      key={rowNum}
+                      id={ `Variation ${rowNum} USA` }
+                      type="text"
+                      label={ `Variation ${rowNum} USA` }
+                      handleInputChange={getIpData}
+
+                    />
+                    <InputField
+                      key={i}
+                      id={ `RTP ${rowNum} USA`}
+                      type="text"
+                      label={ `RTP ${rowNum} USA`}
+                      handleInputChange={getIpData}
+                    />
+                      </div>
+                    )
+                  })
+                }
+                   
+                  </div>
+
+           
+            
             </div>
 
             {/* Labels + Inputs for RTPs */}
