@@ -247,16 +247,16 @@ const GameForm = () => {
     const numValue = Number(value);
     setFormData((prev) => {
       const safePrev = prev || {};
-      const existing = safePrev.availableFor || [];
+      const existing = safePrev.companyIds || [];
       const updated = existing.includes(numValue)
         ? existing
         : [...existing, numValue];
 
-      const { rtp, rtpUsa } = buildFinalRtpData({ ...safePrev, availableFor: updated });
+      const { rtp, rtpUsa } = buildFinalRtpData({ ...safePrev, companyIds: updated });
 
       return {
         ...safePrev,
-        availableFor: updated,
+        companyIds: updated,
         rtp,
         rtpUsa
       };
