@@ -238,32 +238,89 @@ const GameForm = () => {
     fetchGame()
   }, [])
 
-  const getIpData = (e) => {
-    let { name, value } = e.target;
-    if (name === "companyId") {
-      const numValue = Number(value);
-      setFormData((prev) => {
-        const safePrev = prev || {};
-        const existing = safePrev.availableFor || [];
-        const updated = existing.includes(numValue)
-          ? existing
-          : [...existing, numValue];
-        return { ...safePrev, availableFor: updated };
-      });
-      return;
-    }
 
 
-    setFormData((prev) => (
-      {
-        ...prev,
-        [name]: value,
-        studioId: id,
-        freeSpins: enabled
+ const getIpData = (e) => {
+  let { name, value } = e.target;
 
-      }
-    ))
+  if (name === "companyId") {
+    const numValue = Number(value);
+    setFormData((prev) => {
+      const safePrev = prev || {};
+      const existing = safePrev.availableFor || [];
+      const updated = existing.includes(numValue)
+        ? existing
+        : [...existing, numValue];
+
+      const { rtp, rtpUsa } = buildFinalRtpData({ ...safePrev, availableFor: updated });
+
+      return {
+        ...safePrev,
+        availableFor: updated,
+        rtp,
+        rtpUsa
+      };
+    });
+    return;
   }
+
+  setFormData((prev) => {
+    const updatedForm = {
+      ...prev,
+      [name]: value,
+      studioId: id,
+      freeSpins: enabled
+    };
+
+    const { rtp, rtpUsa } = buildFinalRtpData(updatedForm);
+
+    return {
+      ...updatedForm,
+      rtp,
+      rtpUsa
+    };
+  });
+};
+
+
+const buildFinalRtpData = (data) => {
+  if (!data || typeof data !== "object") return { rtp: {}, rtpUsa: {} };
+
+  const rtp = {};
+  const rtpUsa = {};
+
+  const variationKeys = Object.keys(data).filter(
+    (key) => key.startsWith("Variation ") && !key.includes("USA")
+  );
+
+  const variationUsaKeys = Object.keys(data).filter(
+    (key) => key.startsWith("Variation ") && key.includes("USA")
+  );
+
+  variationKeys.forEach((variationKey, i) => {
+    const rtpKey = `RTP ${i + 1}`;
+    if (data[variationKey]) {
+      rtp[data[variationKey]] = data[rtpKey] || "";
+    }
+  });
+
+  variationUsaKeys.forEach((variationKey, i) => {
+    const rtpUsaKey = `RTP ${i + 1} USA`;
+    if (data[variationKey]) {
+      rtpUsa[data[variationKey]] = data[rtpUsaKey] || "";
+    }
+  });
+
+  return { rtp, rtpUsa };
+};
+
+
+
+
+const data = buildFinalRtpData();
+console.log(data);
+
+
 
 const handleFileUpload = (e) => {
   const { name, files, multiple } = e.target;
@@ -304,10 +361,17 @@ const handleFileUpload = (e) => {
 
 
   const handleSubmit = async (e, status) => {
+
+
+
     e.preventDefault()
+
+
+
     try {
       const finalData = {
         ...formData,
+         
         status,
       };
       console.log(finalData);
@@ -470,7 +534,7 @@ console.log(value);
     const isChecked = e.target.checked;
     setFormData((prev) => ({
       ...prev,
-      availableFor: isChecked ? [] : null
+      companyIds: isChecked ? [] : null
     }));
   };
   console.log(formData);
