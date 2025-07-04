@@ -349,8 +349,6 @@ const buildFinalRtpData = () => {
 };
 const buildVariationInpFromRtpData = (rtpData) => {
   const variationInp = {};
-  debugger
-
 
   const { rtp = {}, rtpUsa = {} } = rtpData;
 
@@ -375,7 +373,7 @@ const buildVariationInpFromRtpData = (rtpData) => {
 useEffect(() => {
   if(!formData?.rtpVersions )return
  const data= buildVariationInpFromRtpData(formData?.rtpVersions)
-
+debugger
   
   setVariationInp(data); 
 }, [formData]);
@@ -430,6 +428,7 @@ const handleFileUpload = (e) => {
 
     e.preventDefault()
 
+    
 const { rtp, rtpUsa } = buildFinalRtpData();
 
 

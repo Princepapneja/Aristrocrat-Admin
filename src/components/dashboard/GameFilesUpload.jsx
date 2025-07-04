@@ -368,9 +368,6 @@ const fetchFolders = async () => {
         const fetchGameData = async () => {
             try {
                 const { data } = await apiHandler.get(`/game/${param?.id}`);
-                console.log(data)
-
-
                 setFormData({
                     title: data?.data?.title || '',
                     subStudioId: data?.data?.subStudioId || '',
