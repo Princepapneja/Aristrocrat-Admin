@@ -112,7 +112,7 @@ const InputField = ({
           </label>
         ) : type === "textEditor" ? (
           <JoditEditor value={value} onChange={handleEditorChange} />
-        ) :
+        ) : 
          type === "checkbox" ? (
           <label htmlFor={id} className="flex items-center gap-2 cursor-pointer">
             <input

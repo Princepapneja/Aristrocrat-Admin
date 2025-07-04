@@ -13,6 +13,7 @@ import { ChevronUp } from "lucide-react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import apiHandler from "../../functions/apiHandler";
 import useGlobal from "../../hooks/useGlobal";
+import { dateFormat } from "../../functions/dateFormat";
 
 
 const GameForm = () => {
@@ -149,7 +150,7 @@ const GameForm = () => {
       // //console.log(newSubstudio);
 
       setSubStudios([
-        { name: "Select SubStudio", id: "", },
+        { name: "Select Studio", id: "", },
         ...newSubstudio
       ]);
       // setGames((prev) => (filters.skip === 0 ? newGames : [...prev, ...newGames]));
@@ -179,9 +180,20 @@ const GameForm = () => {
     try {
       const { data } = await apiHandler.get(`/companies`);
       console.log(data);
-      setCompanyList(data?.data)
+      // setCompanyList(data?.data)
 
+ const company = data?.data?.map((e) => {
+        return {
+          name: e?.name,
+          id: e?.id
+        }
+      }) || [];
+      // //console.log(newSubstudio);
 
+      setCompanyList([
+        { name: "Select Company", id: "", },
+        ...company
+      ]);
       // setGames((prev) => (filters.skip === 0 ? newGames : [...prev, ...newGames]));
       // setHasMore((filters.skip + filters.limit) < data.data.total);
       // setTotalGames(data.data.total);
@@ -218,17 +230,29 @@ const GameForm = () => {
   };
 
   // //console.log(formData);
-  const fetchGame = async () => {
-    if (!gameId) return
-    try {
-      const { data } = await apiHandler.get(`/game/${gameId}`)
-      console.log(data);
+const fetchGame = async () => {
+  if (!gameId) return;
 
-      setFormData({ ...data?.data, categoryIds: data?.data?.categories?.map((e) => e.id) })
-    } catch (error) {
+  try {
+    const { data } = await apiHandler.get(`/game/${gameId}`);
+    const game = data?.data;
 
-    }
+    const { rtpVersions = {} } = game;
+    const { rtp = {}, rtpUsa = {} } = rtpVersions;
+
+    setFormData({
+      ...game,
+      categoryIds: game?.categories?.map((e) => e.id),
+      rtp,     
+      rtpUsa    
+    });
+
+
+  } catch (error) {
+    console.error("Failed to fetch game:", error);
   }
+};
+
 
   useEffect(() => {
     fetchSubStudios()
@@ -240,85 +264,117 @@ const GameForm = () => {
 
 
 
- const getIpData = (e) => {
-  let { name, value } = e.target;
+const getIpData = (e, index) => {
+  const { name, type, value, checked } = e.target;
+    const finalValue = type === "checkbox" ? checked : value;
+  const numValue = Number(value);
 
   if (name === "companyId") {
-    const numValue = Number(value);
+
     setFormData((prev) => {
       const safePrev = prev || {};
       const existing = safePrev.companyIds || [];
-      const updated = existing.includes(numValue)
-        ? existing
-        : [...existing, numValue];
 
-      const { rtp, rtpUsa } = buildFinalRtpData({ ...safePrev, companyIds: updated });
+ 
+      if (existing.includes(numValue)) {
+     
+        error("This partner has already been selected.");
+        return prev; 
+      }
 
-      return {
-        ...safePrev,
-        companyIds: updated,
-        rtp,
-        rtpUsa
-      };
+      const updated = [...existing];
+      updated[index] = numValue;
+
+      return { ...safePrev, companyIds: updated };
     });
     return;
   }
 
-  setFormData((prev) => {
-    const updatedForm = {
-      ...prev,
-      [name]: value,
-      studioId: id,
-      freeSpins: enabled
-    };
-
-    const { rtp, rtpUsa } = buildFinalRtpData(updatedForm);
-
-    return {
-      ...updatedForm,
-      rtp,
-      rtpUsa
-    };
-  });
+  setFormData((prev) => ({
+    ...prev,
+    [name]: value,
+     [name]: finalValue,
+    studioId: id,
+  }));
 };
 
 
-const buildFinalRtpData = (data) => {
-  if (!data || typeof data !== "object") return { rtp: {}, rtpUsa: {} };
+const [variationInp,setVariationInp]=useState(null)
+
+ const handleVariation = (e) => {
+  
+        let { name, value } = e.target;
+        setVariationInp((prev) => (
+            {
+                ...prev,
+                [name]: value
+            }
+        ))
+    }
+
+
+const buildFinalRtpData = () => {
+  if (!variationInp || typeof variationInp !== "object") return { rtp: {}, rtpUsa: {} };
 
   const rtp = {};
   const rtpUsa = {};
 
-  const variationKeys = Object.keys(data).filter(
+  const variationKeys = Object.keys(variationInp).filter(
     (key) => key.startsWith("Variation ") && !key.includes("USA")
   );
 
-  const variationUsaKeys = Object.keys(data).filter(
+  const variationUsaKeys = Object.keys(variationInp).filter(
     (key) => key.startsWith("Variation ") && key.includes("USA")
   );
 
   variationKeys.forEach((variationKey, i) => {
+    const variationValue = variationInp[variationKey];
     const rtpKey = `RTP ${i + 1}`;
-    if (data[variationKey]) {
-      rtp[data[variationKey]] = data[rtpKey] || "";
+    const rtpValue = variationInp[rtpKey];
+
+    if (variationValue?.trim() && rtpValue?.trim()) {
+      rtp[variationValue] = rtpValue;
     }
   });
 
   variationUsaKeys.forEach((variationKey, i) => {
+    const variationValue = variationInp[variationKey];
     const rtpUsaKey = `RTP ${i + 1} USA`;
-    if (data[variationKey]) {
-      rtpUsa[data[variationKey]] = data[rtpUsaKey] || "";
+    const rtpUsaValue = variationInp[rtpUsaKey];
+
+    if (variationValue?.trim() && rtpUsaValue?.trim()) {
+      rtpUsa[variationValue] = rtpUsaValue;
     }
   });
 
   return { rtp, rtpUsa };
 };
 
+useEffect(() => {
+  if (!formData?.rtp && !formData?.rtpUsa) return;
+
+  const flat = {};
+
+  // Regular RTPs
+  const rtpEntries = Object.entries(formData?.rtp || {});
+  rtpEntries.forEach(([variation, rtp], index) => {
+    flat[`Variation ${index + 1}`] = variation;
+    flat[`RTP ${index + 1}`] = rtp;
+  });
+
+  // USA RTPs
+  const rtpUsaEntries = Object.entries(formData?.rtpUsa || {});
+  rtpUsaEntries.forEach(([variation, rtp], index) => {
+    flat[`Variation ${index + 1} USA`] = variation;
+    flat[`RTP ${index + 1} USA`] = rtp;
+  });
+
+  setVariationInp(flat); 
+}, [formData?.rtp, formData?.rtpUsa]);
 
 
+console.log(variationInp);
 
-const data = buildFinalRtpData();
-console.log(data);
 
 
 
@@ -327,6 +383,7 @@ const handleFileUpload = (e) => {
   if (!files || files.length === 0) return;
 
   if (multiple) {
+
     setFormData((prev) => ({
       ...prev,
       [name]: [...(prev?.[name] || []), ...files], 
@@ -363,19 +420,17 @@ const handleFileUpload = (e) => {
   const handleSubmit = async (e, status) => {
 
 
-
     e.preventDefault()
 
+const { rtp, rtpUsa } = buildFinalRtpData();
 
 
     try {
       const finalData = {
         ...formData,
-         
+       rtpVersions:{rtp,rtpUsa},
         status,
       };
-      console.log(finalData);
-      debugger
       let resp = null
       if (gameId) {
         const { data } = await apiHandler.patch(`/game/${gameId}`, finalData)
@@ -401,7 +456,7 @@ const handleFileUpload = (e) => {
 
   const handleCategories = (e, type) => {
 
-console.log(e);
+// console.log(e);
 
     if (e.type === "clearAll") {
       setFormData((prev => ({ ...prev, categoryIds: [] })))
@@ -451,40 +506,7 @@ console.log(value);
 
     setFormData((prev => ({ ...prev, subStudioIds: data })))
   }
-  useEffect(() => {
 
-
-    const fetchGameData = async () => {
-      try {
-        const { data } = await apiHandler.get(`/game/11`);
-        console.log(data)
-        // setFormData({
-        //   title: data?.data?.title || '',
-        //   subStudioId: data?.data?.subStudioId || '',
-        //   description: data?.data?.description || '',
-        //   demoLink: data?.data?.demoLink || '',
-        //   categories: data?.data?.categories || [],
-        //   releaseDate: data?.data?.releaseDate || '',
-        //   gameKey: data?.data?.gameKey || '',
-        //   livesWays: data?.data?.livesWays || '',
-        //   max: data?.data?.max || '',
-        //   maxExposure: data?.data?.maxExposure || '',
-        //   realType: data?.data?.realType || '',
-        //   min: data?.data?.min || '',
-
-
-        //   // variations: data?.data?.variations || [{ variation: "", rtp: "" }],
-        //   freeSpins: data?.data?.freeSpins || false,
-        //   // partners: data?.data?.partners || [{ partner: '' }],
-        //   // ... Add all other fields here based on the structure of your API response
-        // });
-      } catch (err) {
-        console.error("Error fetching game data: ", err);
-      }
-    };
-
-    fetchGameData();
-  }, [id]);
 
   const [categoryFormData, setCategoryFormData] = useState(null)
 
@@ -531,6 +553,7 @@ console.log(value);
   }
 
   const handleAllCheckbox = (e) => {
+    
     const isChecked = e.target.checked;
     setFormData((prev) => ({
       ...prev,
@@ -778,30 +801,32 @@ const removeScreenshot = (indexToRemove) => {
           <div>
             {/* Labels + Inputs for Variations */}
             <div className="grid grid-cols-2 md:grid-cols-8 gap-4 text-center text-sm font-semibold mb-2 mt-10">
-              {variationColumns.map((val) => {
-
+              {variationColumns.map((val,i) => {
                 // const id = `variation_${index + 1}`;
                 return (
                   <InputField
-                    key={val?.id}
+                    key={i}
                     id={val?.name}
                     type="text"
                     label={val?.name}
-                    handleInputChange={getIpData}
+                    handleInputChange={handleVariation}
+                    value={variationInp?.[`Variation ${i+1}`] ?? ""}
                   />
                 );
               })}
 
-              {rtpColumns.map((val, idx) => {
+              {rtpColumns.map((val, i) => {
 
                 // const id = `variation_${index + 1}`;
                 return (
                   <InputField
-                    key={val?.id}
+                    key={i}
                     id={val?.name}
                     type="text"
                     label={val?.name}
-                    handleInputChange={getIpData}
+                    handleInputChange={handleVariation}
+                    value={variationInp?.[`RTP ${i+1}`] ?? ""}
+
                   />
                 );
               })}
@@ -815,14 +840,14 @@ const removeScreenshot = (indexToRemove) => {
                 {
                   extraRows.map((rowNum, i)=>{
                     return(
-                      <div key={i} className="flex flex-col space-y-1">
+                      <div key={rowNum} className="flex flex-col space-y-1">
 
                        <InputField
                       key={rowNum}
                       id={`Variation ${rowNum}`}
                       type="text"
                       label={`Variation ${rowNum}`}
-                      handleInputChange={getIpData}
+                      handleInputChange={handleVariation}
 
                     />
                     <InputField
@@ -830,7 +855,7 @@ const removeScreenshot = (indexToRemove) => {
                       id={`RTP ${rowNum}`}
                       type="text"
                       label={`RTP ${rowNum}`}
-                      handleInputChange={getIpData}
+                      handleInputChange={handleVariation}
                     />
                       </div>
                     )
@@ -844,14 +869,14 @@ const removeScreenshot = (indexToRemove) => {
                 {
                   extraRows.map((rowNum, i)=>{
                     return(
-                      <div key={i} className="flex flex-col space-y-1">
+                      <div key={rowNum} className="flex flex-col space-y-1">
 
                        <InputField
                       key={rowNum}
                       id={ `Variation ${rowNum} USA` }
                       type="text"
                       label={ `Variation ${rowNum} USA` }
-                      handleInputChange={getIpData}
+                      handleInputChange={handleVariation}
 
                     />
                     <InputField
@@ -859,7 +884,7 @@ const removeScreenshot = (indexToRemove) => {
                       id={ `RTP ${rowNum} USA`}
                       type="text"
                       label={ `RTP ${rowNum} USA`}
-                      handleInputChange={getIpData}
+                      handleInputChange={handleVariation}
                     />
                       </div>
                     )
@@ -900,24 +925,26 @@ const removeScreenshot = (indexToRemove) => {
         </div>
       }
       {!direct &&
-        <div className="grid grid-cols-4 gap-4 mt-10  items-center justify-center ">
+        <div className="grid grid-cols-4 gap-4 mt-10  items-center ">
           <Studio className="w-full" label="Volatility" preSelected={formData?.categoryIds} showBtn={true} options={volatility} onChange={handleCategories} name="VolatilityId" handleCreate={handleCreate} createCategory={createCategory} />
           <Studio className="w-full" label="Jackpots" preSelected={formData?.categoryIds} showBtn={true} options={jackpot} onChange={handleCategories} name="JackpotsId" handleCreate={handleCreate} createCategory={createCategory} />
 
-          <div className="flex items-center  space-x-3 w-full">
-            <span className="text-sm font-semibold text-black">Free Spins</span>
+          
 
-            <button
-              onClick={() => setEnabled(!enabled)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300
-        ${enabled ? "bg-emerald-500" : "bg-gray-300"}`}
-            >
-              <span
-                className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300
-          ${enabled ? "translate-x-5" : "translate-x-1"}`}
-              />
-            </button>
-          </div>
+            <InputField 
+            label="Free Spins"
+            type="switch"
+            id="freeSpins"
+            handleInputChange={getIpData}
+            value={formData?.freeSpins}
+            className="flex justify-start gap-5 item-center"
+            />
+
+
+
+
+         
+ 
 
           <div className="w-full">
             <label className="block text-sm font-semibold mb-1 text-black">Bet Values</label>
@@ -998,7 +1025,7 @@ const removeScreenshot = (indexToRemove) => {
             <input
               type="date"
               className="border border-gray-300 rounded-[10px] px-2 py-1 bg-[#00B290] text-white hover:bg-[black] custom-date"
-              value={formData?.releaseDate}
+              value={dateFormat(formData?.releaseDate)}
               onChange={(e) =>
                 setFormData((prev) => ({
                   ...prev,
@@ -1092,47 +1119,44 @@ const removeScreenshot = (indexToRemove) => {
                 <Minus className="w-4 h-4 text-white p-0 bg-red-500 rounded-full " />
                 <span className="text-red-500">All</span>
               </div>
-              : <InputField type="checkbox" label="All" className='bg-white flex gap-4 p-4 rounded-[10px]' handleInputChange={handleAllCheckbox}
+              : <InputField type="checkbox" label="All" className='bg-white flex gap-4 p-4 rounded-[10px]'   value={formData?.companyIds?.length ===0 || true} handleInputChange={handleAllCheckbox}
               />
           }
 
 
-          {availablefor &&
-            (
-              <>
-                {partners.map((item, index) => (
-                  <div key={index} className="flex items-center justify-evenly space-x-4 mb-3 ">
-                    <InputField
-                      type="select"
-                      placeholder="Choose Partner/Operator"
-                      options={companyList}
-                      handleInputChange={getIpData}
-                      className='bg-white'
-                      id="companyId"
+         {availablefor && (
+  <>
+    {partners.map((item, index) => (
+      <div key={index} className="flex items-center justify-evenly space-x-4 mb-3 ">
+        <InputField
+          type="select"
+          placeholder="Choose Partner/Operator"
+          options={companyList}
+          handleInputChange={(e) => getIpData(e, index)} 
+          className="bg-white"
+          id="companyId"
+          value={formData?.companyIds?.[index] || ''}
+        />
+        <X
+          size={20}
+          className="text-black cursor-pointer hover:text-black"
+          onClick={() => handleRemovePartner(index)}
+        />
+      </div>
+    ))}
 
-                    />
-                    <X
-                      size={20}
-                      className="text-black cursor-pointer hover:text-black"
-                      onClick={() => handleRemovePartner(index)}
-                    />
-                  </div>
-                ))}
+    <div className="mt-10 flex justify-center">
+      <button
+        className="flex items-center space-x-2 text-black text-sm font-medium cursor-pointer"
+        onClick={handleAddPartner}
+      >
+        <span>Add More</span>
+        <Plus size={35} className="border rounded-[5px]" />
+      </button>
+    </div>
+  </>
+)}
 
-                <div className="mt-10 flex justify-center">
-                  <button
-                    className="flex items-center space-x-2 text-black text-sm font-medium cursor-pointer"
-                    onClick={handleAddPartner}
-                  >
-                    <span>Add More</span>
-                    <Plus size={35} className="border rounded-[5px]" />
-                  </button>
-                </div>
-
-
-              </>
-            )
-          }
 
 
 
