@@ -243,8 +243,6 @@ const fetchGame = async () => {
     setFormData({
       ...game,
       categoryIds: game?.categories?.map((e) => e.id),
-      rtp,     
-      rtpUsa    
     });
 
 
@@ -349,28 +347,38 @@ const buildFinalRtpData = () => {
 
   return { rtp, rtpUsa };
 };
+const buildVariationInpFromRtpData = (rtpData) => {
+  const variationInp = {};
+  debugger
+
+
+  const { rtp = {}, rtpUsa = {} } = rtpData;
+
+  // Handle RTP (non-USA)
+  const rtpEntries = Object.entries(rtp);
+  rtpEntries.forEach(([variationValue, rtpValue], i) => {
+    variationInp[`Variation ${i + 1}`] = variationValue;
+    variationInp[`RTP ${i + 1}`] = rtpValue;
+  });
+
+  // Handle RTP USA
+  const rtpUsaEntries = Object.entries(rtpUsa);
+  rtpUsaEntries.forEach(([variationValue, rtpUsaValue], i) => {
+    variationInp[`Variation ${i + 1} USA`] = variationValue;
+    variationInp[`RTP ${i + 1} USA`] = rtpUsaValue;
+  });
+
+  return variationInp;
+};
+
 
 useEffect(() => {
-  if (!formData?.rtp && !formData?.rtpUsa) return;
+  if(!formData?.rtpVersions )return
+ const data= buildVariationInpFromRtpData(formData?.rtpVersions)
 
-  const flat = {};
-
-  // Regular RTPs
-  const rtpEntries = Object.entries(formData?.rtp || {});
-  rtpEntries.forEach(([variation, rtp], index) => {
-    flat[`Variation ${index + 1}`] = variation;
-    flat[`RTP ${index + 1}`] = rtp;
-  });
-
-  // USA RTPs
-  const rtpUsaEntries = Object.entries(formData?.rtpUsa || {});
-  rtpUsaEntries.forEach(([variation, rtp], index) => {
-    flat[`Variation ${index + 1} USA`] = variation;
-    flat[`RTP ${index + 1} USA`] = rtp;
-  });
-
-  setVariationInp(flat); 
-}, [formData?.rtp, formData?.rtpUsa]);
+  
+  setVariationInp(data); 
+}, [formData]);
 
 
 console.log(variationInp);
@@ -810,7 +818,7 @@ const removeScreenshot = (indexToRemove) => {
                     type="text"
                     label={val?.name}
                     handleInputChange={handleVariation}
-                    value={variationInp?.[`Variation ${i+1}`] ?? ""}
+                    value={variationInp?.[val.name]}
                   />
                 );
               })}
@@ -825,7 +833,8 @@ const removeScreenshot = (indexToRemove) => {
                     type="text"
                     label={val?.name}
                     handleInputChange={handleVariation}
-                    value={variationInp?.[`RTP ${i+1}`] ?? ""}
+                    value={variationInp?.[val.name]}
+
 
                   />
                 );
