@@ -14,6 +14,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import apiHandler from "../../functions/apiHandler";
 import useGlobal from "../../hooks/useGlobal";
 import { dateFormat } from "../../functions/dateFormat";
+import moment from "moment";
 
 
 const GameForm = () => {
@@ -237,16 +238,19 @@ const fetchGame = async () => {
     const { data } = await apiHandler.get(`/game/${gameId}`);
     const game = data?.data;
 
-    const { rtpVersions = {} } = game;
-    const { rtp = {}, rtpUsa = {} } = rtpVersions;
+    const transformedDates = (game?.Countries || []).map((country) => ({
+      id: country.id,
+      date: country?.GameCountryRelease?.date
+        ? moment(country.GameCountryRelease.date).format("YYYY-MM-DD")
+        : "",
+    }));
 
     setFormData({
       ...game,
       categoryIds: game?.categories?.map((e) => e.id),
-      rtp,     
-      rtpUsa    
+     
     });
-
+ setDates(transformedDates.length ? transformedDates : [{ id: "", date: "" }]);
 
   } catch (error) {
     console.error("Failed to fetch game:", error);
@@ -312,6 +316,11 @@ const [variationInp,setVariationInp]=useState(null)
         ))
     }
 
+// console.log(variationInp);
+
+
+
+// console.log(extraRows);
 
 const buildFinalRtpData = () => {
   if (!variationInp || typeof variationInp !== "object") return { rtp: {}, rtpUsa: {} };
@@ -350,31 +359,45 @@ const buildFinalRtpData = () => {
   return { rtp, rtpUsa };
 };
 
+
 useEffect(() => {
-  if (!formData?.rtp && !formData?.rtpUsa) return;
+  if (!formData?.rtpVersions?.rtp && !formData?.rtpVersions?.rtpUsa) return;
+
+  const rtpLength = Object.keys(formData?.rtpVersions?.rtp || {}).length;
+const rtpUsalength = Object.keys(formData?.rtpVersions?.rtp || {}).length;
+
+
+ if (rtpLength > 4) {
+    const extras = [];
+    for (let i = 5; i <= rtpLength; i++) {
+      extras.push(i);
+    }
+    setExtraRows(extras);
+  }
 
   const flat = {};
 
   // Regular RTPs
-  const rtpEntries = Object.entries(formData?.rtp || {});
+  const rtpEntries = Object.entries(formData?.rtpVersions?.rtp || {});
   rtpEntries.forEach(([variation, rtp], index) => {
     flat[`Variation ${index + 1}`] = variation;
     flat[`RTP ${index + 1}`] = rtp;
   });
 
   // USA RTPs
-  const rtpUsaEntries = Object.entries(formData?.rtpUsa || {});
+  const rtpUsaEntries = Object.entries(formData?.rtpVersions?.rtpUsa || {});
   rtpUsaEntries.forEach(([variation, rtp], index) => {
     flat[`Variation ${index + 1} USA`] = variation;
     flat[`RTP ${index + 1} USA`] = rtp;
   });
 
   setVariationInp(flat); 
-}, [formData?.rtp, formData?.rtpUsa]);
+}, [formData?.rtpVersions?.rtp, formData?.rtpVersions?.rtpUsa]);
 
 
 console.log(variationInp);
 
+console.log(formData);
 
 
 
@@ -594,6 +617,7 @@ console.log(value);
     const [showFilterModal, setShowFilterModal] = useState(false);
 
 
+
 const removeScreenshot = (indexToRemove) => {
   setFormData((prev) => {
     const updatedScreenshots = prev?.screenshots?.filter((_, index) => index !== indexToRemove);
@@ -810,7 +834,8 @@ const removeScreenshot = (indexToRemove) => {
                     type="text"
                     label={val?.name}
                     handleInputChange={handleVariation}
-                    value={variationInp?.[`Variation ${i+1}`] ?? ""}
+                   value={variationInp?.[val.name]}
+
                   />
                 );
               })}
@@ -825,7 +850,7 @@ const removeScreenshot = (indexToRemove) => {
                     type="text"
                     label={val?.name}
                     handleInputChange={handleVariation}
-                    value={variationInp?.[`RTP ${i+1}`] ?? ""}
+                    value={variationInp?.[val.name]}
 
                   />
                 );
@@ -848,7 +873,7 @@ const removeScreenshot = (indexToRemove) => {
                       type="text"
                       label={`Variation ${rowNum}`}
                       handleInputChange={handleVariation}
-
+                      value={variationInp?.[`Variation ${rowNum}`]}
                     />
                     <InputField
                       key={i}
@@ -856,6 +881,7 @@ const removeScreenshot = (indexToRemove) => {
                       type="text"
                       label={`RTP ${rowNum}`}
                       handleInputChange={handleVariation}
+                       value={variationInp?.[`RTP ${rowNum}`]}
                     />
                       </div>
                     )
@@ -877,6 +903,7 @@ const removeScreenshot = (indexToRemove) => {
                       type="text"
                       label={ `Variation ${rowNum} USA` }
                       handleInputChange={handleVariation}
+                        value={variationInp?.[`Variation ${rowNum} USA`]}
 
                     />
                     <InputField
@@ -885,6 +912,7 @@ const removeScreenshot = (indexToRemove) => {
                       type="text"
                       label={ `RTP ${rowNum} USA`}
                       handleInputChange={handleVariation}
+                      value={variationInp?.[`RTP ${rowNum} USA`]}
                     />
                       </div>
                     )
@@ -1025,7 +1053,7 @@ const removeScreenshot = (indexToRemove) => {
             <input
               type="date"
               className="border border-gray-300 rounded-[10px] px-2 py-1 bg-[#00B290] text-white hover:bg-[black] custom-date"
-              value={dateFormat(formData?.releaseDate)}
+              value={moment(formData?.releaseDate).format("YYYY-MM-DD")}
               onChange={(e) =>
                 setFormData((prev) => ({
                   ...prev,
@@ -1043,10 +1071,10 @@ const removeScreenshot = (indexToRemove) => {
               <div className="relative w-3/4   rounded-[10px] ">
                 <select
                   className="appearance-none text-base font-semibold w-full bg-[#FAFAFA] border border-gray-300 text-black py-2 px-4 pr-10 rounded-[10px] focus:outline-none"
-                  value={item.country}
+                  value={item.id}
                   onChange={(e) => handleChange(index, "id", e.target.value)}
                 >
-                  <option value="">Choose Country</option>
+                  <option >Choose Country</option>
                   {countries.map((country) => {
                     
                     
@@ -1119,7 +1147,7 @@ const removeScreenshot = (indexToRemove) => {
                 <Minus className="w-4 h-4 text-white p-0 bg-red-500 rounded-full " />
                 <span className="text-red-500">All</span>
               </div>
-              : <InputField type="checkbox" label="All" className='bg-white flex gap-4 p-4 rounded-[10px]'   value={formData?.companyIds?.length ===0 || true} handleInputChange={handleAllCheckbox}
+              : <InputField type="checkbox" label="All" className='bg-white flex gap-4 p-4 rounded-[10px]'   checked={formData?.companyIds?.length ===0 || true} handleInputChange={handleAllCheckbox}
               />
           }
 
