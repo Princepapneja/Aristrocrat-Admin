@@ -6,7 +6,7 @@ import expandWindowImg from '../../assets/adminAssets/expand-window-2--expand-sm
 
 import { ChevronRight } from "lucide-react";
 import useGlobal from "../../hooks/useGlobal";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import apiHandler from "../../functions/apiHandler";
 import axios from "axios";
 import GameFolderCard from "../utils/gameFolderCard";
@@ -31,10 +31,13 @@ const GameFilesUpload = React.memo(() => {
     const [rootLevels, setRootLevels] = useState([])
     const [subStudios, setSubStudios] = useState([])
     const [formData, setFormData] = useState(null)
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+  const [showStudioModal, setShowStudioModal] = useState("");
 
     const fetchSubStudios = async () => {
         try {
-            const { data } = await apiHandler.get(`sub-studios/${formData?.subStudioId}`);
+            const { data } = await apiHandler.get(`sub-studios/${searchParams?.get("studioId")}`);
             const newSubstudio = data?.data?.map((e) => {
                 return {
                     name: e?.name,
@@ -55,9 +58,6 @@ const GameFilesUpload = React.memo(() => {
 
     const getIpData = (e) => {
         let { name, value } = e.target;
-
-
-
         if (name === "companyId") {
             const numValue = Number(value);
             setFormData((prev) => {
@@ -83,60 +83,56 @@ const GameFilesUpload = React.memo(() => {
     }
 
 
-const fetchRootLevels = async () => {
-    try {
-        let url = `games/${param.id}/folders`
-        const { data } = await apiHandler.get(url)
-        console.log(data);
-        setRootLevels(data?.data?.folders || [])
-    } catch (error) {
-        console.error("Error fetching root levels:", error)
+    const fetchRootLevels = async () => {
+        try {
+            let url = `games/${param.id}/folders`
+            const { data } = await apiHandler.get(url)
+            console.log(data);
+            setRootLevels(data?.data?.folders || [])
+        } catch (error) {
+            console.error("Error fetching root levels:", error)
+        }
     }
-}
 
-const fetchFolders = async () => {
-    try {
-        if(!selectedFolder && rootLevels?.length===0 ){
-            return
+    const fetchFolders = async () => {
+        try {
+            if (!selectedFolder && rootLevels?.length === 0) {
+                return
+            }
+            let url = `games/${param.id}/folders`
+
+            if (selectedFolder) {
+                console.log(selectedFolder)
+                url += `?folder=${selectedFolder?.id}`
+            } else {
+                url += `?folder=${rootLevels?.[activeStep]?.id}`
+            }
+
+            const { data } = await apiHandler.get(url)
+            console.log(data)
+
+            if (selectedFolder) {
+                setSubFolderFile(data?.data?.files)
+                setFolders(data?.data?.folders || [])
+                setFiles(data?.data?.files)
+            } else {
+                setFolders(data?.data?.folders || [])
+                setFiles(data?.data?.files)
+            }
+        } catch (error) {
+            console.error("Error fetching folders:", error)
         }
-        let url = `games/${param.id}/folders`
-
-        if (selectedFolder) {
-            console.log(selectedFolder)
-            url += `?folder=${selectedFolder?.id}`
-        } else {
-            url += `?folder=${rootLevels?.[activeStep]?.id}`
-        }
-
-        const { data } = await apiHandler.get(url)
-        console.log(data)
-
-        if (selectedFolder) {
-            setSubFolderFile(data?.data?.files)
-            setFolders(data?.data?.folders || [])
-            setFiles(data?.data?.files)
-        } else {
-            setFolders(data?.data?.folders || [])
-            setFiles(data?.data?.files)
-        }
-    } catch (error) {
-        console.error("Error fetching folders:", error)
     }
-}
 
 
 
     useEffect(() => {
         setUploadedFolders([]);
-
-
     }, [param.id])
 
 
     useEffect(() => {
-        
         fetchSubStudios()
-
     }, [param.id, formData?.subStudioId])
 
 
@@ -302,7 +298,6 @@ const fetchFolders = async () => {
 
     useEffect(() => {
         fetchRootLevels()
-
     }, [])
 
 
@@ -334,7 +329,7 @@ const fetchFolders = async () => {
             );
 
             // console.log(res);
-           setAddExclusivity(!addExclusivity)
+            setAddExclusivity(!addExclusivity)
             success(res?.data.message);
 
         } catch (err) {
@@ -381,7 +376,7 @@ const fetchFolders = async () => {
 
         fetchGameData();
     }, [param?.id]);
-    
+
 
     return (
         <div className="mt-6">
@@ -392,14 +387,14 @@ const fetchFolders = async () => {
                         type="text"
                         className="w-full border border-gray-300 rounded-md px-4 py-2"
                         placeholder="Enter game name"
-                         onChange={getIpData}
+                        onChange={getIpData}
                         name="title"
                         value={formData?.title}
                     />
                 </div>
 
                 <div className="w-1/4 mt-6">
-                    <InputField type="select" options={subStudios} handleInputChange={getIpData} id='subStudioId' name='subStudioId'  value={formData?.subStudioId}/>
+                    <InputField type="select" options={subStudios} handleInputChange={getIpData} id='subStudioId' name='subStudioId' value={formData?.subStudioId} />
 
                 </div>
             </div>
@@ -465,7 +460,7 @@ const fetchFolders = async () => {
                     )
                 }
 
-             {activeStep!==3 &&    <div className="flex justify-end items-center mb-4 relative">
+                {activeStep !== 3 && <div className="flex justify-end items-center mb-4 relative">
 
                     {/* {
     selectedFolder?"": <div
@@ -492,9 +487,9 @@ const fetchFolders = async () => {
 } */}
                     <div
                         className="bg-white flex items-center gap-[10px] p-4 rounded-[10px] mb-5 cursor-pointer"
-                        onClick={() => setShowPopup(true)}
+                        onClick={() => {setShowPopup(true);  setShowStudioModal("folder")}}
                     >
-                        <span className="text-[#00B290]">Cretate Folder</span>
+                        <span className="text-[#00B290]">Create Folder</span>
                         <Plus className="w-4 h-4 text-white p-0 bg-[#00B290] rounded-full" />
                     </div>
 
@@ -617,7 +612,7 @@ const fetchFolders = async () => {
            */}
 
             <div className="mt-6 w-full">
-                <GameFolderCard selectedFoldersPre={selectedFoldersPre} setSelectedFoldersPre={setSelectedFoldersPre} type={rootLevels?.[activeStep]?.id} uploadedFolders={uploadedFolders} addNewFolder={addNewFolder} showPopup={showPopup} setShowPopup={setShowPopup} handleInput={handleInput} fetchFolders={fetchFolders} handleFileChange={handleFileChange} selectedFolder={selectedFolder} setSelectedFolder={setSelectedFolder} gameId={param.id} files={files} folders={folders} onSelectionChange={handleSelectionChange} subFolderFile={subFolderFile} activeStep={activeStep} />
+                <GameFolderCard selectedFoldersPre={selectedFoldersPre} setSelectedFoldersPre={setSelectedFoldersPre} type={rootLevels?.[activeStep]?.id} uploadedFolders={uploadedFolders} addNewFolder={addNewFolder} showPopup={showPopup} setShowPopup={setShowPopup} handleInput={handleInput} fetchFolders={fetchFolders} handleFileChange={handleFileChange} selectedFolder={selectedFolder} setSelectedFolder={setSelectedFolder} gameId={param.id} files={files} folders={folders} onSelectionChange={handleSelectionChange} subFolderFile={subFolderFile} activeStep={activeStep} showStudioModal={showStudioModal} setShowStudioModal={setShowStudioModal} />
 
                 <div className="flex w-full justify-between gap-2 mt-10 mb-10">
                     <button className="flex-grow bg-[#A8A8A8] text-[#6F6F6F] text-sm font-semibold py-3 px-3 rounded-[10px] cursor-pointer flex justify-center items-center gap-2" onClick={handleSubmit}>

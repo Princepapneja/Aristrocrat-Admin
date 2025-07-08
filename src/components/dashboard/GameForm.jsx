@@ -15,15 +15,11 @@ import apiHandler from "../../functions/apiHandler";
 import useGlobal from "../../hooks/useGlobal";
 import { dateFormat } from "../../functions/dateFormat";
 import moment from "moment";
+import AvailableFor from "./availableFor";
+import axios from "axios";
 
 
 const GameForm = () => {
-  const [variations, setVariations] = useState([{ variation: "", rtp: "" }]);
-
-  const [enabled, setEnabled] = useState(false);
-
-  const [availablefor, setAvailableFor] = useState(false)
-  const [partners, setPartners] = useState([{ partner: "" }]);
   const location = useLocation();
   // console.log(location);
 
@@ -34,17 +30,10 @@ const GameForm = () => {
   const id = searchParams.get("studioId");
   const direct = searchParams.get("direct") === "true";
 
-
-  // //console.log(param);
   const [countries, setCountries] = useState([])
-
-
   const [subStudios, setSubStudios] = useState([])
   const { error, success } = useGlobal()
   const [companyList, setCompanyList] = useState([])
-
-
-
   const [gameType, setGameType] = useState([]);
   const [familyType, setFamilyType] = useState([]);
   const [feature, setFeature] = useState([]);
@@ -53,56 +42,25 @@ const GameForm = () => {
   const [jackpot, setJackpot] = useState([]);
 
   const [formData, setFormData] = useState(null)
-  const [variationRows, setVariationRows] = useState(1);
 
   const [extraRows, setExtraRows] = useState([]);
 
   const navigate = useNavigate()
-  const handleAddPartner = () => {
-    setPartners([...partners, { partner: "" }]);
-  };
-
-  const handleRemovePartner = (index) => {
-    const updatedPartners = [...partners];
-    updatedPartners.splice(index, 1);
-    setPartners(updatedPartners);
-  };
-
-  const handlePartnerChange = (index, value) => {
-    const updated = [...partners];
-    updated[index].partner = value;
-    console.log(updated);
-
-    setPartners(updated);
-  };
-
-
   const [dates, setDates] = useState([
     { id: "", date: "" },
   ]);
 
   const handleChange = (index, field, value) => {
-
-
-
     const updatedDates = [...dates];
     updatedDates[index][field] = value;
     //console.log( updatedDates);
-
     setDates(updatedDates);
-
     const countryReleaseDates = updatedDates.reduce((acc, item) => {
-      console.log(item);
-      
-
       if (item.id && item.date) {
         acc[item.id] = new Date(item.date).toISOString();
       }
       return acc;
     }, {});
-
-    //console.log(regionalReleaseDates);
-
     setFormData((prev) => ({
       ...prev,
       countryReleaseDates
@@ -244,12 +202,13 @@ const fetchGame = async () => {
         ? moment(country.GameCountryRelease.date).format("YYYY-MM-DD")
         : "",
     }));
-
+debugger
     setFormData({
       ...game,
       categoryIds: game?.categories?.map((e) => e.id),
-     
+      companyIds:game?.companies?.map((e)=>e.id)
     });
+    
  setDates(transformedDates.length ? transformedDates : [{ id: "", date: "" }]);
 
   } catch (error) {
@@ -358,29 +317,6 @@ const buildFinalRtpData = () => {
 
   return { rtp, rtpUsa };
 };
-const buildVariationInpFromRtpData = (rtpData) => {
-  const variationInp = {};
-
-  const { rtp = {}, rtpUsa = {} } = rtpData;
-
-  // Handle RTP (non-USA)
-  const rtpEntries = Object.entries(rtp);
-  rtpEntries.forEach(([variationValue, rtpValue], i) => {
-    variationInp[`Variation ${i + 1}`] = variationValue;
-    variationInp[`RTP ${i + 1}`] = rtpValue;
-  });
-
-  // Handle RTP USA
-  const rtpUsaEntries = Object.entries(rtpUsa);
-  rtpUsaEntries.forEach(([variationValue, rtpUsaValue], i) => {
-    variationInp[`Variation ${i + 1} USA`] = variationValue;
-    variationInp[`RTP ${i + 1} USA`] = rtpUsaValue;
-  });
-
-  return variationInp;
-};
-
-
 
 useEffect(() => {
   if (!formData?.rtpVersions?.rtp && !formData?.rtpVersions?.rtpUsa) return;
@@ -417,12 +353,6 @@ const rtpUsalength = Object.keys(formData?.rtpVersions?.rtp || {}).length;
 }, [formData?.rtpVersions?.rtp, formData?.rtpVersions?.rtpUsa]);
 
 
-console.log(variationInp);
-
-console.log(formData);
-
-
-
 const handleFileUpload = (e) => {
   const { name, files, multiple } = e.target;
   if (!files || files.length === 0) return;
@@ -441,8 +371,6 @@ const handleFileUpload = (e) => {
     }));
   }
 };
-
-
   const handleNextClick = async (e) => {
     e.preventDefault();
     try {
@@ -463,42 +391,81 @@ const handleFileUpload = (e) => {
 
 
   const handleSubmit = async (e, status) => {
-
-
-    e.preventDefault()
-
-    
-const { rtp, rtpUsa } = buildFinalRtpData();
-
-
+    e.preventDefault();
+  
+    const { rtp, rtpUsa } = buildFinalRtpData();
+  debugger
     try {
-      const finalData = {
+      // 1. Prepare initial payload
+      const basePayload = {
         ...formData,
-       rtpVersions:{rtp,rtpUsa},
+        rtpVersions: { rtp, rtpUsa },
         status,
+        logo: typeof formData?.logo === "string" ? formData.logo : "",
+        thumbnail: typeof formData?.thumbnail === "string" ? formData.thumbnail : "",
+        portrait: typeof formData?.portrait === "string" ? formData.portrait : "",
       };
-      let resp = null
+  
+      // 2. Create or Update the game
+      let response;
       if (gameId) {
-        const { data } = await apiHandler.patch(`/game/${gameId}`, finalData)
-        resp = data
+        const { data } = await apiHandler.patch(`/game/${gameId}`, basePayload);
+        response = data;
+      } else {
+        const { data } = await apiHandler.post(`/games`, basePayload);
+        response = data;
       }
-      else {
-        const { data } = await apiHandler.post(`/games`, finalData)
-        resp = data
-
+  
+      // 3. Upload images if needed
+      const imageFields = ['logo', 'thumbnail', 'portrait'];
+      const uploadedImages = {};
+  
+      for (const field of imageFields) {
+        const file = formData?.[field];
+        if (file && typeof file !== "string") {
+          const uploadedUrl = await handleFiles(file);
+          if (uploadedUrl) {
+            uploadedImages[field] = uploadedUrl;
+          }
+        }
       }
-      success(resp?.message)
-      setFormData(null)
-      setGameId(resp?.data?.id)
-      return { successData: resp.data };
-      // //console.log(data);
-
-      // setRender(!render)
+  
+      // 4. Patch game with uploaded image URLs
+      if (Object.keys(uploadedImages).length > 0) {
+        await apiHandler.patch(`/game/${gameId || response?.data?.id}`, uploadedImages);
+      }
+  
+      // 5. Final state update
+      success(response?.message || "Saved successfully");
+      setFormData(null);
+      setGameId(response?.data?.id);
+  
+      return { successData: response.data };
+  
     } catch (err) {
-      error(err.message)
+      error(err.message || "Something went wrong");
       return { success: false };
     }
-  }
+  };
+  const handleFiles = async (file) => {
+    try {
+      const gameData = {
+        name: file.name,
+        gameId,
+        fileType: file.type,
+      };
+  
+      const { data } = await apiHandler.post("/upload", gameData);
+      await axios.put(data?.data?.uploadUrl, file,{    'x-amz-acl': 'public-read', 
+      });
+      return data?.data?.fileUrl;
+  
+    } catch (err) {
+      error(err.message || "File upload failed");
+      return null;
+    }
+  };
+  
 
   const handleCategories = (e, type) => {
 
@@ -512,8 +479,6 @@ const { rtp, rtpUsa } = buildFinalRtpData();
 
     const data = [...formData?.categoryIds || []]
     const value = e.target.value
-console.log(value);
-
     if (data.includes(value)) {
       data?.filter((q) => {
         return q !== value
@@ -525,35 +490,6 @@ console.log(value);
 
     setFormData((prev => ({ ...prev, categoryIds: data })))
   }
-
-
-  const handleSubStudio = (e, type) => {
-
-
-    if (type === "clearAll") {
-      setFormData((prev => ({ ...prev, subStudioIds: [] })))
-      return
-    }
-    const data = [...formData?.subStudioIds || []]
-
-    const value = e.target.value
-    console.log(value);
-
-    if (data.includes(value)) {
-
-      data?.filter((q) => {
-
-        return q !== value
-      })
-    } else {
-      data.push(value)
-    }
-    console.log(data);
-
-    setFormData((prev => ({ ...prev, subStudioIds: data })))
-  }
-
-
   const [categoryFormData, setCategoryFormData] = useState(null)
 
   const handleCreate = (event) => {
@@ -734,8 +670,8 @@ const removeScreenshot = (indexToRemove) => {
                       <label className="py-2 px-4 w-full flex items-center whitespace-nowrap justify-between" htmlFor={item.name}
                       >
                         <span className="truncate w-48">
-                          <span className="capitalize">{formData?.[name]?.name && `${name}: `}</span>
-                        {formData?.[name]?.name || item?.placeholder}
+                          <span className="capitalize">{(formData?.[name]?.name || formData?.[name]) && `${name}: `}</span>
+                        {formData?.[name]?.name || formData?.[name] || item?.placeholder}
                         </span>
                         <span className="ml-2"><Upload size={20} /></span>
                       </label>
@@ -1145,74 +1081,9 @@ const removeScreenshot = (indexToRemove) => {
           </div>
         </div>
       }
-      {!direct &&
-        <div className="w-full bg-[#F4F4F4] p-6 rounded-[10px] mt-5">
-
-          <div className="flex items-center justify-between mb-4  ">
-            <h2 className="text-2xl font-semibold leading-[24px] mb-4">Available For</h2>
-            {
-              availablefor ?
-                <button className="border border-[#A8A8A8] px-2 py-1 rounded-[10px]  text-balck] font-semibold flex items-center gap-2 cursor-pointer" onClick={() => setAvailableFor(!availablefor)}>
-                  <MoveLeft className="w-4 h-4  " />
-                  Go Back
-                </button> :
-                <button className="border border-[#00B290] px-2 py-1 rounded-[10px] hover:bg-[#b1e1d8] text-[#00B290] font-semibold flex items-center gap-2 cursor-pointer" onClick={() => setAvailableFor(!availablefor)}>
-                  Make Exclusive For
-                </button>
-            }
-
-
-          </div>
-          {
-            availablefor ?
-              <div className='bg-white flex items-center gap-[10px] p-4 rounded-[10px] mb-5'>
-
-                <Minus className="w-4 h-4 text-white p-0 bg-red-500 rounded-full " />
-                <span className="text-red-500">All</span>
-              </div>
-              : <InputField type="checkbox" label="All" className='bg-white flex gap-4 p-4 rounded-[10px]'   checked={formData?.companyIds?.length ===0 || true} handleInputChange={handleAllCheckbox}
-              />
-          }
-
-
-         {availablefor && (
-  <>
-    {partners.map((item, index) => (
-      <div key={index} className="flex items-center justify-evenly space-x-4 mb-3 ">
-        <InputField
-          type="select"
-          placeholder="Choose Partner/Operator"
-          options={companyList}
-          handleInputChange={(e) => getIpData(e, index)} 
-          className="bg-white"
-          id="companyId"
-          value={formData?.companyIds?.[index] || ''}
-        />
-        <X
-          size={20}
-          className="text-black cursor-pointer hover:text-black"
-          onClick={() => handleRemovePartner(index)}
-        />
-      </div>
-    ))}
-
-    <div className="mt-10 flex justify-center">
-      <button
-        className="flex items-center space-x-2 text-black text-sm font-medium cursor-pointer"
-        onClick={handleAddPartner}
-      >
-        <span>Add More</span>
-        <Plus size={35} className="border rounded-[5px]" />
-      </button>
-    </div>
-  </>
-)}
-
-
-
-
-
-        </div>
+      {
+        !direct &&
+     <AvailableFor setFormData={setFormData} formData={formData} companyList={companyList} getIpData={getIpData} />
       }
       <p className="text-[#6F6F6F] text-2xl font-['OT_Sono'] font-semibold mt-10 mb-10 text-center">
         Publish, Save draft  <span className="text-[#6F6F6F] text-xl font-['OT_Sono'] font-normal">or click</span>  Next <span className="text-[#6F6F6F] text-xl font-['OT_Sono'] font-normal">to go to the drive and follow the steps</span>

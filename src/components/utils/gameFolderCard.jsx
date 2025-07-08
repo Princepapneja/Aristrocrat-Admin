@@ -5,10 +5,9 @@ import InputField from "./InputFields";
 import apiHandler from "../../functions/apiHandler";
 import StudioDropdown from "./studio";
 
-const GameFolderCard = React.memo(({ options, addExclusivity, setAddExclusivity, setSelectedFoldersPre, selectedFoldersPre, type, subFolderFile, handleFileChange, onSelectionChange, selectedFolder, folders, setSelectedFolder, gameId, files, fetchFolders, setShowPopup, showPopup, addNewFolder, handleInput, uploadedFolders, activeStep }) => {
+const GameFolderCard = React.memo(({ options, addExclusivity, setAddExclusivity, setSelectedFoldersPre, selectedFoldersPre, type, subFolderFile, handleFileChange, onSelectionChange, selectedFolder, folders, setSelectedFolder, gameId, files, fetchFolders, setShowPopup, showPopup, addNewFolder, handleInput, uploadedFolders, activeStep,showStudioModal, setShowStudioModal }) => {
   const [open, setOpen] = useState(false)
   const [menuItems, setMenuItems] = useState([])
-  const [showStudioModal, setShowStudioModal] = useState(false);
 
   const [companyList, setCompanyList] = useState([])
   const fetchCompany = async () => {
@@ -69,12 +68,8 @@ const GameFolderCard = React.memo(({ options, addExclusivity, setAddExclusivity,
 
 
   const handleSelectedFolder = (folder) => {
-
-    console.log(folder);
-
     setSelectedFolder(folder)
     // setMenuItems(prevItems => [...prevItems, folder?.name]);
-
   }
 
   const file = uploadedFolders.length > 0 ? uploadedFolders : files;
@@ -101,9 +96,9 @@ const GameFolderCard = React.memo(({ options, addExclusivity, setAddExclusivity,
 
   }, [folders, activeStep])
 
-  const handleModal = () => {
+  const handleModal = (type) => {
     setShowPopup(!showPopup)
-    setShowStudioModal(!showStudioModal)
+    setShowStudioModal(type)
 
   }
 
@@ -118,8 +113,6 @@ console.log(type);
             <div className="text-sm text-gray-600 mt-8" aria-label="Breadcrumb">
               <ol className="flex items-center space-x-1 md:space-x-3">
                 {menuItems.length > 0 && menuItems?.map((item, index) => {
-                  console.log(item);
-
                   return (
                     <li key={index} className="inline-flex items-center cursor-pointer">
                       {index !== 0 && (
@@ -198,7 +191,7 @@ console.log(type);
                 checked:after:flex checked:after:justify-center checked:after:items-center"
                     />
 
-                    <span className="hover:text-[#00B290] absolute top-5 cursor-pointer right-4 bg-[#393939] text-white text-[15px] font-[600] px-3 py-1 rounded-[10px] flex items-center justify-around gap-2">
+                    <span onClick={()=>{setShowStudioModal("company")}} className="hover:text-[#00B290] absolute top-5 cursor-pointer right-4 bg-[#393939] text-white text-[15px] font-[600] px-3 py-1 rounded-[10px] flex items-center justify-around gap-2">
                       Company <SquareArrowOutUpRight size={18} />
                     </span>
 
@@ -231,7 +224,7 @@ console.log(type);
                 checked:after:flex checked:after:justify-center checked:after:items-center"
                     />
 
-                    <span className="hover:text-[#00B290] absolute top-5 cursor-pointer right-4 bg-[#393939] text-white text-[15px] font-[600] px-3 py-1 rounded-[10px] flex items-center justify-around gap-2">
+                    <span onClick={()=>{setShowStudioModal("company")}} className="hover:text-[#00B290] absolute top-5 cursor-pointer right-4 bg-[#393939] text-white text-[15px] font-[600] px-3 py-1 rounded-[10px] flex items-center justify-around gap-2">
                       Company <SquareArrowOutUpRight size={18} />
                     </span>
 
@@ -330,7 +323,7 @@ console.log(type);
                 checked:after:flex checked:after:justify-center checked:after:items-center"
                                     />
 
-                                    <span onClick={() => handleModal()} className="hover:text-[#00B290] absolute top-5 cursor-pointer right-4 bg-[#393939] text-white text-[15px] font-[600] px-3 py-1 rounded-[10px] flex items-center justify-around gap-2">
+                                    <span onClick={() => handleModal("company")} className="hover:text-[#00B290] absolute top-5 cursor-pointer right-4 bg-[#393939] text-white text-[15px] font-[600] px-3 py-1 rounded-[10px] flex items-center justify-around gap-2">
                                       Company <SquareArrowOutUpRight size={18} />
                                     </span>
 
@@ -409,7 +402,7 @@ console.log(type);
                 checked:after:flex checked:after:justify-center checked:after:items-center"
                           />
 
-                          <span onClick={() => handleModal()} className="hover:text-[#00B290] absolute top-5 cursor-pointer right-4 bg-[#393939] text-white text-[15px] font-[600] px-3 py-1 rounded-[10px] flex items-center justify-around gap-2">
+                          <span onClick={() => handleModal("company")} className="hover:text-[#00B290] absolute top-5 cursor-pointer right-4 bg-[#393939] text-white text-[15px] font-[600] px-3 py-1 rounded-[10px] flex items-center justify-around gap-2">
                             Company <SquareArrowOutUpRight size={18} />
                           </span>
 
@@ -456,7 +449,9 @@ console.log(type);
                 checked:after:flex checked:after:justify-center checked:after:items-center"
                     />
 
-                    <span onClick={() => setShowStudioModal(true)} className="hover:text-[#00B290] absolute top-5 cursor-pointer right-4 bg-[#393939] text-white text-[15px] font-[600] px-3 py-1 rounded-[10px] flex items-center justify-around gap-2">
+                    <span onClick={() => {
+                      debugger
+                      setShowStudioModal("company")}} className="hover:text-[#00B290] absolute top-5 cursor-pointer right-4 bg-[#393939] text-white text-[15px] font-[600] px-3 py-1 rounded-[10px] flex items-center justify-around gap-2">
                       Company <SquareArrowOutUpRight size={18} />
                     </span>
 
@@ -569,10 +564,10 @@ console.log(type);
 
       {showPopup && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
-          {showStudioModal ?
+          {showStudioModal === "company" ?
 
             <div
-              className=""
+              className="w-full h-full grid place-items-center"
             ><StudioDropdown className="w-full" label='Studio' showBtn={false} options={companyList} addExclusivity={showStudioModal} name="companyIds" /></div>
             :
             <div
@@ -582,11 +577,12 @@ console.log(type);
 
                 <h2 className="text-xl font-semibold mb-4">Create Folder</h2>
 
+                {showStudioModal}
 
                 <X
                   size={16}
                   className="text-black cursor-pointer hover:text-black"
-                  onClick={() => setShowPopup(false)}
+                  onClick={() => {setShowPopup(false)}}
                 />
               </div>
               <InputField type='text' placeholder={`Enter Folder Name`} id='folder' handleInputChange={handleInput} />

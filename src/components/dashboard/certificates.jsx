@@ -100,8 +100,6 @@ const[gamesList, setGameLists]=useState(
 
 
             <div className='container'>
-
-
                 {/*  section */}
                 <div className='flex justify-between mb-14'>
                     <h1 className='text-5xl font-medium'>Certificates</h1>

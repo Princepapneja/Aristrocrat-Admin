@@ -16,7 +16,6 @@ import useGlobal from '../../hooks/useGlobal';
 function GamePage() {
   const [params] = useSearchParams()
   const studio = params.get("studio")
-  // //console.log(studio)
   const [filters, setFilters] = useState({ skip: 0, limit: 12, studio: studio || "" });
   const [games, setGames] = useState([]);
   const [hasMore, setHasMore] = useState(true);

@@ -1,5 +1,4 @@
 import React from 'react'
-import cardImg from '../../assets/adminAssets/_fortineSM_story_size_1080x1920.png'
 import { Link } from 'react-router-dom'
 import pencil from '../../assets/adminAssets/pencil--change-edit-modify-pencil-write-writing.png'
 import Modal from './Modal'
@@ -19,11 +18,18 @@ function GameCard({game,setHoveredCardIndex,hoveredCardIndex,index,handleGameDel
   return (
      <div key={game.id} className="max-w-[280px] rounded-xl  shadow bg-white relative">
             <div className="relative">
-              <img
-                src={cardImg}
+              {
+                game?.thumbnail ? 
+                <img
+                src={game?.thumbnail||""}
                 alt="Game Poster"
                 className="w-full h-[300px] object-cover rounded-t-xl"
               />
+                : <div className='h-[300px] bg-[url(/logos/defaultCard.png)] grid place-items-center'>
+                  <h4 className='text-white-v1 text-xl font-bold'>{game?.studio?.name}</h4>
+                </div>
+              }
+             
               <div
                 className="absolute top-3 left-3 text-black px-3 py-2 text-xs font-semibold rounded-[10px]"
                 style={{
