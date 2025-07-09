@@ -262,6 +262,7 @@ const GameFilesUpload = React.memo(() => {
 
         setFormData((prev => ({ ...prev, companyIds: data })))
     }
+
     const handleSubmit = async (e, folderId) => {
         e.preventDefault();
         const companyIds = formData?.companyIds || [];
@@ -287,6 +288,32 @@ const GameFilesUpload = React.memo(() => {
     };
 
 
+
+    const [ids,setIds]=useState(null)
+
+    console.log(ids);
+
+        const editPermission = async (e) => {
+
+        // e.preventDefault();
+      
+
+      
+        try {
+            const res = await apiHandler.post(
+                `/game/${param?.id}/permissions`,
+                formData 
+            );
+            setAddExclusivity(!addExclusivity)
+            success(res?.data.message);
+
+        } catch (err) {
+            error(err.message);
+        }
+    };
+
+
+console.log(formData);
 
 
     const addNewFolder = async () => {
@@ -476,7 +503,7 @@ if(loading) {
 } */}
                     <div
                         className="bg-white flex items-center gap-[10px] p-4 rounded-[10px] mb-5 cursor-pointer"
-                        onClick={() => { setGameShowPopup(true); setShowStudioModal("folder") }}
+                        onClick={() => { setGameShowPopup(true); setShowStudioModal("CreateFolder") }}
                     >
                         <span className="text-[#00B290]">Create Folder</span>
                         <Plus className="w-4 h-4 text-white p-0 bg-[#00B290] rounded-full" />
@@ -606,7 +633,7 @@ if(loading) {
                     <MiniLoader />
                 </div>
                     :
-                    <GameFolderCard selectedFoldersPre={selectedFoldersPre} setSelectedFoldersPre={setSelectedFoldersPre} type={rootLevels?.[activeStep]?.id} uploadedFolders={uploadedFolders} addNewFolder={addNewFolder} gameShowPopup={gameShowPopup} setGameShowPopup={setGameShowPopup} handleInput={handleInput} fetchFolders={fetchFolders} handleFileChange={handleFileChange} selectedFolder={selectedFolder} setSelectedFolder={setSelectedFolder} gameId={param.id} files={files} folders={folders} onSelectionChange={handleSelectionChange} subFolderFile={subFolderFile} activeStep={activeStep} showStudioModal={showStudioModal} setShowStudioModal={setShowStudioModal} preSelected={formData?.companies} onChange={handleCompanyId} handleSelectedFolder={handleSelectedFolder} loading={loading} setLoading={setLoading} />
+                    <GameFolderCard editPermission={editPermission} setFormData={setFormData} selectedFoldersPre={selectedFoldersPre} setSelectedFoldersPre={setSelectedFoldersPre} type={rootLevels?.[activeStep]?.id} uploadedFolders={uploadedFolders} addNewFolder={addNewFolder} gameShowPopup={gameShowPopup} setGameShowPopup={setGameShowPopup} handleInput={handleInput} fetchFolders={fetchFolders} handleFileChange={handleFileChange} selectedFolder={selectedFolder} setSelectedFolder={setSelectedFolder} gameId={param.id} files={files} folders={folders} onSelectionChange={handleSelectionChange} subFolderFile={subFolderFile} activeStep={activeStep} showStudioModal={showStudioModal} setShowStudioModal={setShowStudioModal} preSelected={formData?.companies} onChange={handleCompanyId} handleSelectedFolder={handleSelectedFolder} loading={loading} setLoading={setLoading} />
                 }
 
 

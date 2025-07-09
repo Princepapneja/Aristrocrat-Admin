@@ -18,6 +18,7 @@ import moment from "moment";
 import AvailableFor from "./availableFor";
 import axios from "axios";
 import Loader from '../utils/miniLoader'
+import MiniLoader from "../utils/miniLoader";
 
 
 const GameForm = () => {
@@ -596,11 +597,16 @@ const removeScreenshot = (indexToRemove) => {
   });
 };
 
+if(loading) {
+    return <div className="fixed inset-0 z-50 bg-white/70 backdrop-blur-sm flex items-center justify-center">
+            <MiniLoader/>
 
+    </div>
+}
 
   return (
 <>
-   {loading && <Loader  fullscreen/>}
+   
 
     <div className=" mt-6 mb-6 bg-white min-h-screen text-gray-800 font-sans">
      
@@ -722,7 +728,7 @@ const removeScreenshot = (indexToRemove) => {
 
             
 
-             <div className="w-full text-black grid gap-2 mt-2 text-base font-medium rounded-[10px] cursor-pointer overflow-y-auto max-h-40 ">
+             <div className="w-full text-black grid gap-2 mt-5 text-base font-medium rounded-[10px] cursor-pointer overflow-y-auto max-h-40 ">
 
           {
              formData?.screenshots?.length >0 && <div className='flex gap-10'>
@@ -770,6 +776,8 @@ const removeScreenshot = (indexToRemove) => {
 
 
 </div>
+
+
 
 
             </div>

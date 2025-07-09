@@ -5,7 +5,7 @@ import { X,Plus } from 'lucide-react';
 import InputField from './InputFields';
 
 
-export default function StudioDropdown({ label, showBtn ,preSelected ,options,onChange,name,addExclusivity,createCategory,handleCreate,setGameShowPopup}) {
+export default function StudioDropdown({ label, showBtn ,preSelected ,options,onChange,name,addExclusivity,createCategory,handleCreate,setGameShowPopup,addBtn=null}) {
 // console.log(preSelected,"preSelected")
   
   const [open, setOpen] = useState(false);
@@ -59,9 +59,9 @@ const handleClearAll = () => {
   };
 
   const addFilter=()=>{
-
    setOpen(false)
    setGameShowPopup(false)
+   addBtn && addBtn.func()
   }
   
 
@@ -167,7 +167,7 @@ studioName.toLowerCase().includes(searchTerm.toLowerCase())
               className="cursor-pointer bg-[#00B290] hover:bg-black text-white px-4 py-1 rounded-md text-sm"
               onClick={addFilter}
             >
-              Add Filters
+         { addBtn?.name ||  " Add Filters"}
             </button>
             <button
               className="px-3 py-1 text-sm border rounded-md bg-white hover:text-black hover:border-black border-[#A8A8A8] text-gray-700"

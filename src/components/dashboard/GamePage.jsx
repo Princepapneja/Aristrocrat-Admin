@@ -12,6 +12,7 @@ import { Plus, X } from 'lucide-react';
 import '../../../src/mainStyle.css'
 import { ChevronUp } from "lucide-react";
 import useGlobal from '../../hooks/useGlobal';
+import MiniLoader from '../utils/miniLoader';
 
 function GamePage() {
   const [params] = useSearchParams()
@@ -50,18 +51,15 @@ const {success}= useGlobal()
 
   }, [])
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (
-        window.innerHeight + document.documentElement.scrollTop >= document.documentElement.offsetHeight - 100 &&
-        !loading && hasMore
-      ) {
-        setFilters((prev) => ({ ...prev, skip: prev.skip + prev.limit }));
-      }
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [loading, hasMore]);
+const loadMoreGames = () => {
+  if (!loading && hasMore) {
+    setFilters((prev) => ({
+      ...prev,
+      skip: prev.skip + prev.limit,
+    }));
+  }
+};
+
 
   const fetchStudios = async () => {
     try {
@@ -100,7 +98,7 @@ const {success}= useGlobal()
     setLoading(true);
     try {
       const queryParams = new URLSearchParams(filters).toString();
-      const { data } = await apiHandler.get(`games?${queryParams}`);
+      const { data } = await apiHandler.get(`games?${queryParams}&orderBy=createdAt`);
       const newGames = data.data.games || [];
       setGames((prev) => (filters.skip === 0 ? newGames : [...prev, ...newGames]));
       setHasMore((filters.skip + filters.limit) < data.data.total);
@@ -113,8 +111,7 @@ const {success}= useGlobal()
 
 
   const onFilterChange = (e) => {
-    debugger
-    const updatedFilters = { ...filters, [e.target.name]: e.target.value, skip: 0 };
+    const updatedFilters = { ...filters, [e.target.name]: e.target.value};
     setGames([]);
 
     setFilters(updatedFilters);
@@ -164,16 +161,37 @@ const {success}= useGlobal()
 
  const handleGameDelete =async (id)=>{
     try {
-      debugger
 
       await apiHandler.delete(`delete-entry/game/${id}`)
-      success("Game is Deleted succesfullyx")
+      success("Game is Deleted successfully")
       await fetchGames()
     } catch (error) {
       console.log(error)
     }
   } 
-  
+  // useEffect(() => {
+  //   const handleScroll = () => {
+  //     if (
+  //       window.innerHeight + document.documentElement.scrollTop >= document.documentElement.offsetHeight - 100 &&
+  //       !loading && hasMore
+  //     ) {
+  //       setFilters((prev) => ({ ...prev, skip: prev.skip + prev.limit }));
+  //     }
+  //   };
+  //   window.addEventListener('scroll', handleScroll);
+  //   return () => window.removeEventListener('scroll', handleScroll);
+  // }, [loading, hasMore]);
+
+
+
+  if(loading) {
+    return <div className="fixed inset-0 z-50 bg-white/70 backdrop-blur-sm flex items-center justify-center">
+            <MiniLoader/>
+
+    </div>
+}
+
+
   return (
 
 
@@ -221,11 +239,13 @@ const {success}= useGlobal()
           <div className="relative inline-block ">
             <select
               id="category"
-              name="category"
+              name="order"
+               value={filters?.order || 'DESC'}
               className="bg-[#F4F4F4] w-[200px] rounded-[10px] p-2 px-4 pr-10 border-0 appearance-none focus-visible:outline-none"
+              onChange={onFilterChange}
             >
-              <option value="" className=''>Release Date</option>
-              <option value="animation">Option</option>
+              <option value="DESC" className=''>Latest</option>
+              <option value="ASC">Oldest</option>
             </select>
             <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">
               <svg
@@ -245,11 +265,14 @@ const {success}= useGlobal()
           <div className="relative inline-block ">
             <select
               id="category"
-              name="category"
+              name="status"
               className="bg-[#F4F4F4] w-[200px] rounded-[10px] p-2 px-4 pr-10 border-0 appearance-none focus-visible:outline-none"
+              onChange={onFilterChange}
+           value={filters?.status || 'published'}
             >
-              <option value="" className=''>Staus 1</option>
-              <option value="animation">Staus 2</option>
+              <option value="published" className=''>Published</option>
+              <option value="draft">Draft</option>
+              <option value="">All</option>
             </select>
             <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">
               <svg
@@ -288,7 +311,7 @@ const {success}= useGlobal()
 
 
       <div className='mt-[50px] flex justify-center'>
-        <button className='cursor-pointer bg-[#00B290] hover:bg-[black] text-white text-sm font-semibold py-3 px-8 rounded-[10px]'>Load More Game</button>
+        <button className='cursor-pointer bg-[#00B290] hover:bg-[black] text-white text-sm font-semibold py-3 px-8 rounded-[10px]'  onClick={loadMoreGames}>Load More Game</button>
       </div>
 
 

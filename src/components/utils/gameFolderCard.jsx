@@ -6,7 +6,7 @@ import apiHandler from "../../functions/apiHandler";
 import StudioDropdown from "./studio";
 import MiniLoader from "./miniLoader";
 
-const GameFolderCard = React.memo(({options, addExclusivity, setAddExclusivity, setSelectedFoldersPre, selectedFoldersPre, type, subFolderFile, handleFileChange, onSelectionChange, selectedFolder, folders, setSelectedFolder, gameId, files, fetchFolders, setGameShowPopup, gameShowPopup, addNewFolder, handleInput, uploadedFolders, activeStep,showStudioModal, setShowStudioModal,preSelected, onChange,handleSelectedFolder,loading,setLoading}) => {
+const GameFolderCard = React.memo(({options, addExclusivity, setAddExclusivity, setSelectedFoldersPre, selectedFoldersPre, type, subFolderFile, handleFileChange, onSelectionChange, selectedFolder, folders, setSelectedFolder, gameId, files, fetchFolders, setGameShowPopup, gameShowPopup, addNewFolder, handleInput, uploadedFolders, activeStep,showStudioModal, setShowStudioModal,preSelected, onChange,handleSelectedFolder,loading,setLoading,setFormData,editPermission}) => {
   const [open, setOpen] = useState(false)
 console.log(selectedFolder);
 
@@ -59,7 +59,7 @@ console.log(selectedFolder);
       ? selectedFoldersPre.filter((entry) => entry[key] !== item.id)
       : [...selectedFoldersPre, { [key]: item.id }];
 
-    setSelectedFoldersPre(updated);
+    setSelectedFoldersPre(updated); 
     // if (onSelectionChange) onSelectionChange(updated);
   };
   // console.log(files);
@@ -94,12 +94,25 @@ console.log(selectedFolder);
 
   }, [folders, activeStep])
 
-  const handleModal = (type,folder) => {
-    setGameShowPopup(!gameShowPopup)
-    setShowStudioModal(type)
-// console.log(folder);
+const handleModal = (type, folder) => {
+  setGameShowPopup(!gameShowPopup);
+  setShowStudioModal(type);
 
-  }
+  setFormData(prev => {
+    const updatedFormData = { ...prev };
+
+    if (type === 'file') {
+      updatedFormData.fileId = folder; // or whatever key represents file ID
+    } else if (type === 'folder') {
+      updatedFormData.folderId = folder;
+    }
+
+    return updatedFormData;
+  });
+};
+
+
+
 
 // console.log(folders);
 
@@ -396,7 +409,7 @@ console.log(selectedFolder);
                 checked:after:flex checked:after:justify-center checked:after:items-center"
                           />
 
-                          <button disabled={preSelected?.length>0} onClick={() => handleModal("company",folder?.id)} className="hover:text-[#00B290] disabled:opacity-50 disabled:hover:text-white absolute top-5 cursor-pointer right-4 bg-[#393939] text-white text-[15px] font-[600] px-3 py-1 rounded-[10px] flex items-center justify-around gap-2">
+                          <button disabled={preSelected?.length>0} onClick={() => handleModal("folder",folder?.id)} className="hover:text-[#00B290] disabled:opacity-50 disabled:hover:text-white absolute top-5 cursor-pointer right-4 bg-[#393939] text-white text-[15px] font-[600] px-3 py-1 rounded-[10px] flex items-center justify-around gap-2">
                             {/* folder btn */}
                             Company<SquareArrowOutUpRight size={18} />
                           </button>
@@ -444,9 +457,7 @@ console.log(selectedFolder);
                 checked:after:flex checked:after:justify-center checked:after:items-center"
                     />
 
-                    <button   disabled={preSelected?.length>0} onClick={() => {
-                  
-                      setShowStudioModal("company")}} className="hover:text-[#00B290] absolute disabled:opacity-50 disabled:hover:text-white  top-5 cursor-pointer right-4 bg-[#393939] text-white text-[15px] font-[600] px-3 py-1 rounded-[10px] flex items-center justify-around gap-2">
+                    <button   disabled={preSelected?.length>0} onClick={() => handleModal("file",folder?.id)} className="hover:text-[#00B290] absolute disabled:opacity-50 disabled:hover:text-white  top-5 cursor-pointer right-4 bg-[#393939] text-white text-[15px] font-[600] px-3 py-1 rounded-[10px] flex items-center justify-around gap-2">
                       Company <SquareArrowOutUpRight size={18} />
                     </button>
 
@@ -559,11 +570,11 @@ console.log(selectedFolder);
 
       {gameShowPopup && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
-          {showStudioModal === "company" ?
+          {showStudioModal === "folder" || showStudioModal === "file" ?
 
             <div
               className=""
-            ><StudioDropdown  className="w-full" label='Studio' showBtn={false} options={companyList} addExclusivity={showStudioModal} name="companyIds" setGameShowPopup={setGameShowPopup} preSelected={preSelected} onChange={onChange}/></div>
+            ><StudioDropdown  className="w-full" label='Studio' showBtn={false} options={companyList} addExclusivity={showStudioModal} name="companyIds" setGameShowPopup={setGameShowPopup} preSelected={preSelected} onChange={onChange} addBtn={{func:editPermission}}/></div>
             :
             <div
               className="bg-white rounded-[15px] shadow-lg p-6 w-[25%] transform transition-all duration-300 translate-y-10 opacity-0 animate-popup"
