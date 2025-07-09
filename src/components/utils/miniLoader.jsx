@@ -1,10 +1,10 @@
 const MiniLoader = ({ size = 64, fullscreen = false, className = "" }) => {
   const containerClasses = fullscreen
-    ? `fixed inset-0 z-50 bg-white/70 backdrop-blur-sm flex items-center justify-center ${className}`
+    ? ` ${className}`
     : `absolute inset-0 z-20 bg-white/70 backdrop-blur-sm flex items-center justify-center w-full h-full ${className}`;
 
   return (
-    <div className={containerClasses}>
+    // <div className={containerClasses}>
       <div role="status">
         <svg
           aria-hidden="true"
@@ -24,7 +24,7 @@ const MiniLoader = ({ size = 64, fullscreen = false, className = "" }) => {
           />
         </svg>
       </div>
-    </div>
+    // </div>
   );
 };
 

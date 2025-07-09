@@ -11,6 +11,7 @@ import apiHandler from "../../functions/apiHandler";
 import axios from "axios";
 import GameFolderCard from "../utils/gameFolderCard";
 import InputField from "../utils/InputFields";
+import MiniLoader from "../utils/miniLoader";
 
 
 
@@ -18,13 +19,9 @@ const GameFilesUpload = React.memo(() => {
     const param = useParams();
     const { error, success } = useGlobal();
     const [activeStep, setActiveStep] = useState(0);
-    const [gameFile, setGameFiles] = useState([])
-    const [uploadProgress, setUploadProgress] = useState([]);
     const [uploadedFolders, setUploadedFolders] = useState([]);
     const [addExclusivity, setAddExclusivity] = useState(false);
     const [selectedFolder, setSelectedFolder] = useState(null)
-    const [companyList, setCompanyList] = useState([])
-    const [companyIds, setCompanyIds] = useState(null)
     const [folders, setFolders] = useState([])
     const [files, setFiles] = useState([])
     const [subFolderFile, setSubFolderFile] = useState([])
@@ -33,8 +30,37 @@ const GameFilesUpload = React.memo(() => {
     const [formData, setFormData] = useState(null)
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
-  const [showStudioModal, setShowStudioModal] = useState("");
-const [loading, setLoading] = useState(false);
+    const [showStudioModal, setShowStudioModal] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [miniLoader, setMiniLoader] = useState(false);
+    const [menuItems, setMenuItems] = useState([])
+    const [selectedFoldersPre, setSelectedFoldersPre] = useState([]);
+    const [name, setName] = useState("")
+    const [gameShowPopup, setGameShowPopup] = useState(false);
+    useEffect(() => {
+        if (!param.id) return
+        dataSetter()
+    }, [param.id])
+
+    useEffect(() => {
+        fetchFolders()
+    }, [rootLevels,activeStep, uploadedFolders, selectedFolder])
+
+    const dataSetter = async () => {
+        setLoading(true)
+        try {
+            await fetchGame()
+            await fetchSubStudios()
+            await fetchCompany()
+            await fetchRootLevels()
+        } catch (error) {
+            
+        }finally{
+            setLoading(false)
+
+        }
+     
+    }
 
     const fetchSubStudios = async () => {
         try {
@@ -82,8 +108,6 @@ const [loading, setLoading] = useState(false);
             }
         ))
     }
-
-
     const fetchRootLevels = async () => {
         try {
             let url = `games/${param.id}/folders`
@@ -94,10 +118,8 @@ const [loading, setLoading] = useState(false);
             console.error("Error fetching root levels:", error)
         }
     }
-
     const fetchFolders = async () => {
-    setLoading(true);
-
+        setMiniLoader(true);
         try {
             if (!selectedFolder && rootLevels?.length === 0) {
                 return
@@ -124,23 +146,10 @@ const [loading, setLoading] = useState(false);
             }
         } catch (error) {
             console.error("Error fetching folders:", error)
-        }finally {
-    setLoading(false);
-  }
+        } finally {
+            setMiniLoader(false);
+        }
     }
-
-
-
-    useEffect(() => {
-        setUploadedFolders([]);
-    }, [param.id])
-
-
-    useEffect(() => {
-        fetchSubStudios()
-    }, [param.id, formData?.subStudioId])
-
-
     const handleFileChange = async (e) => {
         const selectedFiles = Array.from(e.target.files);
         selectedFiles.forEach(async (file) => {
@@ -151,14 +160,10 @@ const [loading, setLoading] = useState(false);
                 gameId: param?.id,
                 fileType: file.type
             };
-
-
             try {
                 const { data } = await apiHandler.post("/upload", gameData);
                 success(data?.message);
                 fetchFolders()
-
-
                 const newFolder = {
                     name: file.name,
                     uploaded: "0 MB",
@@ -166,9 +171,7 @@ const [loading, setLoading] = useState(false);
                     loading: true,
                     fileType: file.type.includes("pdf") ? "PDF" : "Other",
                 };
-
                 setUploadedFolders((prev) => [...prev, newFolder]);
-
                 const config = {
                     onUploadProgress: (progressEvent) => {
                         const uploadedMB = progressEvent.loaded / (1024 * 1024);
@@ -197,9 +200,7 @@ const [loading, setLoading] = useState(false);
                 };
 
                 try {
-
                     const resp = await axios.put(data?.data?.uploadUrl, file, config);
-
                     setUploadedFolders((prev) =>
                         prev.map((folder) =>
                             folder.name === file.name
@@ -207,8 +208,6 @@ const [loading, setLoading] = useState(false);
                                 : folder
                         )
                     );
-                    // console.log(file);
-
                     try {
                         const fileData = {
                             "name": file?.name,
@@ -218,13 +217,9 @@ const [loading, setLoading] = useState(false);
                             "gameId": param?.id,
                             "type": rootLevels[activeStep]?.name
                         }
-
-                        //console.log(fileData);
-
                         const response = await apiHandler.post("/file", fileData);
-                        setGameFiles(response?.data?.data);
+                        // setGameFiles(response?.data?.data);
                         setUploadedFolders([])
-
                         success(response?.data?.message || "File info saved successfully.");
                     } catch (err) {
                         error(err.message || "Failed to save file info.");
@@ -241,32 +236,7 @@ const [loading, setLoading] = useState(false);
     const fetchCompany = async () => {
         try {
             const { data } = await apiHandler.get(`/companies`);
-
-            //   console.log(data);
             setCompanyList(data.data)
-
-            //       const newSubstudio = data?.data?.map((e) => {
-            //         console.log(e);
-
-            //         return {
-            //           name: e?.name,
-            //           value: e?.id
-            //         }
-            //       }) || [];
-            // // console.log(newSubstudio);
-
-            //       setCompanyList([
-            //         {
-            //           name:"Select Company",
-            //           value:""
-            //         }
-            //         ,
-            //         ...newSubstudio
-            //       ])
-
-            // setGames((prev) => (filters.skip === 0 ? newGames : [...prev, ...newGames]));
-            // setHasMore((filters.skip + filters.limit) < data.data.total);
-            // setTotalGames(data.data.total);
         } catch (error) {
             console.error('Failed to fetch games:', error);
         }
@@ -292,31 +262,10 @@ const [loading, setLoading] = useState(false);
 
         setFormData((prev => ({ ...prev, companyIds: data })))
     }
-
-    console.log(formData);
-
-    useEffect(() => {
-        fetchCompany()
-        fetchFolders()
-    }, [activeStep, uploadedFolders, selectedFolder, rootLevels])
-
-
-    useEffect(() => {
-        fetchRootLevels()
-    }, [])
-
-
-    const [selectedFoldersPre, setSelectedFoldersPre] = useState([]);
-
-
-    const handleSubmit = async (e,folderId) => {
+    const handleSubmit = async (e, folderId) => {
         e.preventDefault();
-
-
         const companyIds = formData?.companyIds || [];
-
         const permissions = selectedFoldersPre.map((item) => {
-            
             if (item.folderId) {
                 return { folderId: item.folderId, companyIds };
             } else if (item.fileId) {
@@ -324,18 +273,11 @@ const [loading, setLoading] = useState(false);
             }
             return null;
         });
-
-
-        // console.log(permissions);
-
-
         try {
             const res = await apiHandler.post(
                 `/game/${param?.id}/permissions`,
                 { permissions }
             );
-
-            // console.log(res);
             setAddExclusivity(!addExclusivity)
             success(res?.data.message);
 
@@ -347,15 +289,11 @@ const [loading, setLoading] = useState(false);
 
 
 
-    const [name, setName] = useState("")
-    const [gameShowPopup, setGameShowPopup] = useState(false);
-
     const addNewFolder = async () => {
         const { data } = await apiHandler.post("folder", {
             gameId: param.id, parentId: selectedFolder?.id || rootLevels[activeStep]?.id, name
 
         })
-        console.log(data, "folder")
         setGameShowPopup(false)
         fetchFolders()
     }
@@ -367,51 +305,49 @@ const [loading, setLoading] = useState(false);
 
 
 
+    const fetchGame = async () => {
+        try {
 
-    useEffect(() => {
+            const { data } = await apiHandler.get(`/game/${param?.id}`);
+            console.log(data);
 
-        const fetchGameData = async () => {
-            try {
-                const { data } = await apiHandler.get(`/game/${param?.id}`);
-                console.log(data);
-                
-                setFormData({
-                    title: data?.data?.title || '',
-                    subStudioId: data?.data?.subStudioId || '',
-                    companies:data?.data?.companies.map((e) => e.id) || ''
+            setFormData({
+                title: data?.data?.title || '',
+                subStudioId: data?.data?.subStudioId || '',
+                companies: data?.data?.companies.map((e) => e.id) || ''
+            });
+        } catch (err) {
+            console.error("Error fetching game data: ", err);
+        }
+    };
 
-
-
-                });
-            } catch (err) {
-                console.error("Error fetching game data: ", err);
-            }
-        };
-
-        fetchGameData();
-    }, [param?.id]);
-  const [menuItems, setMenuItems] = useState([])
 
     const handleSelectedFolder = (folder) => {
-      setSelectedFolder(folder);
-      setMenuItems(prev => [...prev, folder]); 
+        setSelectedFolder(folder);
+        setMenuItems(prev => [...prev, folder]);
+
     };
-    
+
     const handleBreadcrumbClick = (index) => {
-      const newPath = menuItems.slice(0, index + 1);
-      setMenuItems(newPath);
-      setSelectedFolder(newPath[index]);
+        const newPath = menuItems.slice(0, index + 1);
+        setMenuItems(newPath);
+        setSelectedFolder(newPath[index]);
     };
-console.log(selectedFolder);
 
-    const handleRootFolder=()=>{
+    const handleRootFolder = () => {
         setMenuItems([]);
-      setSelectedFolder(null);
+        setSelectedFolder(null);
     }
+if(loading) {
+    return <div className="fixed inset-0 z-50 bg-white/70 backdrop-blur-sm flex items-center justify-center">
+            <MiniLoader/>
 
+    </div>
+}
 
     return (
         <div className="mt-6">
+
             <div className="flex gap-6 justify-between items-center">
                 <div className="w-3/4">
                     <label className="block text-sm font-semibold mb-2">Game Name</label>
@@ -443,11 +379,11 @@ console.log(selectedFolder);
             </div>
 
             <div className="flex items-center justify-between mt-15">
-                {rootLevels.map((label, index) => (
+                {rootLevels?.map((label, index) => (
                     <React.Fragment key={index}>
                         <div
                             className={`flex items-center  gap-5  cursor-pointer px-2 py-3  w-[250px] ${activeStep === index ? 'bg-[#00B290]' : 'bg-[rgba(148,255,128,0.3)]  hover:text-[#00B290] '} rounded-[31px] `}
-                            onClick={() => setActiveStep(index)}
+                            onClick={() => {setActiveStep(index);setSelectedFolder(null);setMenuItems([])}}
                         >
                             <div
                                 className={`w-8 h-8 rounded-[31px] flex items-center justify-center font-bold  ${activeStep === index ? "bg-white text-[#00B290] " : "bg-[rgba(0,178,144,0.6)] text-white "
@@ -484,33 +420,33 @@ console.log(selectedFolder);
 
             <div className={`flex  ${selectedFolder ? "justify-between" : "justify-end"} items-center `}>
                 <div className="flex gap-7 items-center ">
-                {
-                    selectedFolder && (
-                        <button className="border border-[#A8A8A8] px-2 py-1 rounded-[10px]  text-balck] font-semibold flex items-center gap-2 cursor-pointer" onClick={handleRootFolder}>
-                            <MoveLeft className="w-4 h-4  " />
-                            Go Back
-                        </button>
-                    )
-                }
- <div className="text-sm text-gray-600" aria-label="Breadcrumb">
-              <ol className="flex items-center space-x-1 md:space-x-3">
-                {menuItems.length > 0 && menuItems?.map((item, index) => {
-                  
-                  return (
-                    <li key={item?.id} className="inline-flex items-center cursor-pointer"     onClick={() => handleBreadcrumbClick(index)}>
-                      {index !== 0 && (
-                        <ChevronRight className="w-4 h-4 mx-1 text-gray-400" />
-                      )}
-                      <span
+                    {
+                        selectedFolder && (
+                            <button className="border border-[#A8A8A8] px-2 py-1 rounded-[10px]  text-balck] font-semibold flex items-center gap-2 cursor-pointer" onClick={handleRootFolder}>
+                                <MoveLeft className="w-4 h-4  " />
+                                Go Back
+                            </button>
+                        )
+                    }
+                    <div className="text-sm text-gray-600" aria-label="Breadcrumb">
+                        <ol className="flex items-center space-x-1 md:space-x-3">
+                            {menuItems.length > 0 && menuItems?.map((item, index) => {
 
-                      >
-                        {item?.name}
-                      </span>
-                    </li>
-                  )
-                })}
-              </ol>
-            </div>
+                                return (
+                                    <li key={item?.id} className="inline-flex items-center cursor-pointer" onClick={() => handleBreadcrumbClick(index)}>
+                                        {index !== 0 && (
+                                            <ChevronRight className="w-4 h-4 mx-1 text-gray-400" />
+                                        )}
+                                        <span
+
+                                        >
+                                            {item?.name}
+                                        </span>
+                                    </li>
+                                )
+                            })}
+                        </ol>
+                    </div>
                 </div>
 
                 {activeStep !== 3 && <div className="flex justify-end items-center mb-4 relative">
@@ -540,7 +476,7 @@ console.log(selectedFolder);
 } */}
                     <div
                         className="bg-white flex items-center gap-[10px] p-4 rounded-[10px] mb-5 cursor-pointer"
-                        onClick={() => {setGameShowPopup(true);  setShowStudioModal("folder")}}
+                        onClick={() => { setGameShowPopup(true); setShowStudioModal("folder") }}
                     >
                         <span className="text-[#00B290]">Create Folder</span>
                         <Plus className="w-4 h-4 text-white p-0 bg-[#00B290] rounded-full" />
@@ -664,8 +600,15 @@ console.log(selectedFolder);
             </div>
            */}
 
+
             <div className="mt-6 w-full">
-                <GameFolderCard  selectedFoldersPre={selectedFoldersPre} setSelectedFoldersPre={setSelectedFoldersPre} type={rootLevels?.[activeStep]?.id} uploadedFolders={uploadedFolders} addNewFolder={addNewFolder} gameShowPopup={gameShowPopup} setGameShowPopup={setGameShowPopup} handleInput={handleInput} fetchFolders={fetchFolders} handleFileChange={handleFileChange} selectedFolder={selectedFolder} setSelectedFolder={setSelectedFolder} gameId={param.id} files={files} folders={folders} onSelectionChange={handleSelectionChange} subFolderFile={subFolderFile} activeStep={activeStep} showStudioModal={showStudioModal} setShowStudioModal={setShowStudioModal} preSelected={formData?.companies}  onChange={handleCompanyId} handleSelectedFolder={handleSelectedFolder} loading={loading} setLoading={setLoading}/>
+                {miniLoader ?<div className="grid place-items-center">
+                    <MiniLoader />
+                </div>
+                    :
+                    <GameFolderCard selectedFoldersPre={selectedFoldersPre} setSelectedFoldersPre={setSelectedFoldersPre} type={rootLevels?.[activeStep]?.id} uploadedFolders={uploadedFolders} addNewFolder={addNewFolder} gameShowPopup={gameShowPopup} setGameShowPopup={setGameShowPopup} handleInput={handleInput} fetchFolders={fetchFolders} handleFileChange={handleFileChange} selectedFolder={selectedFolder} setSelectedFolder={setSelectedFolder} gameId={param.id} files={files} folders={folders} onSelectionChange={handleSelectionChange} subFolderFile={subFolderFile} activeStep={activeStep} showStudioModal={showStudioModal} setShowStudioModal={setShowStudioModal} preSelected={formData?.companies} onChange={handleCompanyId} handleSelectedFolder={handleSelectedFolder} loading={loading} setLoading={setLoading} />
+                }
+
 
                 <div className="flex w-full justify-between gap-2 mt-10 mb-10">
                     <button className="flex-grow bg-[#A8A8A8] text-[#6F6F6F] text-sm font-semibold py-3 px-3 rounded-[10px] cursor-pointer flex justify-center items-center gap-2" onClick={handleSubmit}>

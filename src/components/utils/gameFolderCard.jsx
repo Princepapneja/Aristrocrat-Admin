@@ -280,7 +280,6 @@ console.log(selectedFolder);
 
 
           <div className=" bg-white font-sans relative">
-               {loading && <MiniLoader  />}
              {
               preSelected?.length>0&&<p className="text-center font-bold p-5 text-xl ">Permissions Already Selected</p>
              }
