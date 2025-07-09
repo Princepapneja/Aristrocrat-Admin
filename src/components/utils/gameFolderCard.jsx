@@ -564,7 +564,7 @@ console.log(selectedFolder);
 
             <div
               className=""
-            ><StudioDropdown handlePermission={handlePermission} className="w-full" label='Studio' showBtn={false} options={companyList} addExclusivity={showStudioModal} name="companyIds" setGameShowPopup={setGameShowPopup} preSelected={preSelected} onChange={onChange}/></div>
+            ><StudioDropdown  className="w-full" label='Studio' showBtn={false} options={companyList} addExclusivity={showStudioModal} name="companyIds" setGameShowPopup={setGameShowPopup} preSelected={preSelected} onChange={onChange}/></div>
             :
             <div
               className="bg-white rounded-[15px] shadow-lg p-6 w-[25%] transform transition-all duration-300 translate-y-10 opacity-0 animate-popup"
