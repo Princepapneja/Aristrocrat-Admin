@@ -5,7 +5,7 @@ import { X,Plus } from 'lucide-react';
 import InputField from './InputFields';
 
 
-export default function StudioDropdown({ label, showBtn ,preSelected ,options,onChange,name,addExclusivity,createCategory,handleCreate,}) {
+export default function StudioDropdown({ label, showBtn ,preSelected ,options,onChange,name,addExclusivity,createCategory,handleCreate,setGameShowPopup}) {
 // console.log(preSelected,"preSelected")
   
   const [open, setOpen] = useState(false);
@@ -41,6 +41,7 @@ setSelected(preSelected)
 const handleClearAll = () => {
   setSelected([]);
   setSearchTerm("");
+  setGameShowPopup(false)
 
   if (onChange) {
     onChange({ target: { name,type:"clearAll", value: [] } });
@@ -57,6 +58,11 @@ const handleClearAll = () => {
     setShowPopup(false);
   };
 
+  const addFilter=()=>{
+
+   setOpen(false)
+   setGameShowPopup(false)
+  }
   
 
   const filteredStudios = options?.filter((studio) =>{
@@ -80,6 +86,7 @@ studioName.toLowerCase().includes(searchTerm.toLowerCase())
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setOpen(false);
+           setGameShowPopup(false)
       }
     };
 
@@ -108,7 +115,7 @@ studioName.toLowerCase().includes(searchTerm.toLowerCase())
      
 
       {open && (
-        <div className={`absolute mt-2  bg-white shadow-lg rounded-md border border-gray-200 z-50 p-4 ${addExclusivity? "w-[260px] right-0":"w-full"} `} >
+        <div className={`absolute mt-2 bg-white shadow-lg rounded-md border border-gray-200 z-50 p-4 ${addExclusivity? "w-[260px]  left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 ":"w-full"} `} >
           {/* <div className='flex items-baseline justify-between'>
               <h2 className="text-lg font-semibold mb-4">Add {label}</h2>
               <X
@@ -158,7 +165,7 @@ studioName.toLowerCase().includes(searchTerm.toLowerCase())
    <div className="flex justify-between items-center px-3 py-2">
             <button
               className="cursor-pointer bg-[#00B290] hover:bg-black text-white px-4 py-1 rounded-md text-sm"
-              onClick={() => setOpen(false)}
+              onClick={addFilter}
             >
               Add Filters
             </button>

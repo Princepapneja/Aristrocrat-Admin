@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Plus, Calendar, Delete, Trash } from "lucide-react";
+import { Plus, Calendar, Delete, Trash,  } from "lucide-react";
 import Studio from '../utils/studio'
 import { Upload } from "lucide-react";
 import InputField from "../utils/InputFields";
@@ -17,6 +17,7 @@ import { dateFormat } from "../../functions/dateFormat";
 import moment from "moment";
 import AvailableFor from "./availableFor";
 import axios from "axios";
+import Loader from '../utils/miniLoader'
 
 
 const GameForm = () => {
@@ -44,7 +45,7 @@ const GameForm = () => {
   const [formData, setFormData] = useState(null)
 
   const [extraRows, setExtraRows] = useState([]);
-
+const [loading, setLoading] = useState(false);
   const navigate = useNavigate()
   const [dates, setDates] = useState([
     { id: "", date: "" },
@@ -392,9 +393,9 @@ const handleFileUpload = (e) => {
 
   const handleSubmit = async (e, status) => {
     e.preventDefault();
-  
+    setLoading(true);
     const { rtp, rtpUsa } = buildFinalRtpData();
-  debugger
+
     try {
       // 1. Prepare initial payload
       const basePayload = {
@@ -445,7 +446,10 @@ const handleFileUpload = (e) => {
     } catch (err) {
       error(err.message || "Something went wrong");
       return { success: false };
-    }
+    }finally {
+    setLoading(false);
+  }
+
   };
   const handleFiles = async (file) => {
     try {
@@ -595,7 +599,11 @@ const removeScreenshot = (indexToRemove) => {
 
 
   return (
+<>
+   {loading && <Loader  fullscreen/>}
+
     <div className=" mt-6 mb-6 bg-white min-h-screen text-gray-800 font-sans">
+     
       <div className="border-b pb-4">
         <div className="">
           <div className="flex gap-6 justify-between items-center">
@@ -1141,6 +1149,8 @@ const removeScreenshot = (indexToRemove) => {
       </div>
 
     </div>
+</>
+    
   );
 };
 

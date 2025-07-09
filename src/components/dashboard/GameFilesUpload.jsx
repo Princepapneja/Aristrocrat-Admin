@@ -34,6 +34,7 @@ const GameFilesUpload = React.memo(() => {
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
   const [showStudioModal, setShowStudioModal] = useState("");
+const [loading, setLoading] = useState(false);
 
     const fetchSubStudios = async () => {
         try {
@@ -95,6 +96,8 @@ const GameFilesUpload = React.memo(() => {
     }
 
     const fetchFolders = async () => {
+    setLoading(true);
+
         try {
             if (!selectedFolder && rootLevels?.length === 0) {
                 return
@@ -109,7 +112,7 @@ const GameFilesUpload = React.memo(() => {
             }
 
             const { data } = await apiHandler.get(url)
-            console.log(data)
+            // console.log(data)
 
             if (selectedFolder) {
                 setSubFolderFile(data?.data?.files)
@@ -121,7 +124,9 @@ const GameFilesUpload = React.memo(() => {
             }
         } catch (error) {
             console.error("Error fetching folders:", error)
-        }
+        }finally {
+    setLoading(false);
+  }
     }
 
 
@@ -304,12 +309,14 @@ const GameFilesUpload = React.memo(() => {
     const [selectedFoldersPre, setSelectedFoldersPre] = useState([]);
 
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e,folderId) => {
         e.preventDefault();
+
 
         const companyIds = formData?.companyIds || [];
 
         const permissions = selectedFoldersPre.map((item) => {
+            
             if (item.folderId) {
                 return { folderId: item.folderId, companyIds };
             } else if (item.fileId) {
@@ -319,7 +326,7 @@ const GameFilesUpload = React.memo(() => {
         });
 
 
-        console.log(permissions);
+        // console.log(permissions);
 
 
         try {
@@ -337,8 +344,11 @@ const GameFilesUpload = React.memo(() => {
         }
     };
 
+
+
+
     const [name, setName] = useState("")
-    const [showPopup, setShowPopup] = useState(false);
+    const [gameShowPopup, setGameShowPopup] = useState(false);
 
     const addNewFolder = async () => {
         const { data } = await apiHandler.post("folder", {
@@ -346,7 +356,7 @@ const GameFilesUpload = React.memo(() => {
 
         })
         console.log(data, "folder")
-        setShowPopup(false)
+        setGameShowPopup(false)
         fetchFolders()
     }
 
@@ -363,9 +373,13 @@ const GameFilesUpload = React.memo(() => {
         const fetchGameData = async () => {
             try {
                 const { data } = await apiHandler.get(`/game/${param?.id}`);
+                console.log(data);
+                
                 setFormData({
                     title: data?.data?.title || '',
                     subStudioId: data?.data?.subStudioId || '',
+                    companies:data?.data?.companies.map((e) => e.id) || ''
+
 
 
                 });
@@ -376,6 +390,24 @@ const GameFilesUpload = React.memo(() => {
 
         fetchGameData();
     }, [param?.id]);
+  const [menuItems, setMenuItems] = useState([])
+
+    const handleSelectedFolder = (folder) => {
+      setSelectedFolder(folder);
+      setMenuItems(prev => [...prev, folder]); 
+    };
+    
+    const handleBreadcrumbClick = (index) => {
+      const newPath = menuItems.slice(0, index + 1);
+      setMenuItems(newPath);
+      setSelectedFolder(newPath[index]);
+    };
+console.log(selectedFolder);
+
+    const handleRootFolder=()=>{
+        setMenuItems([]);
+      setSelectedFolder(null);
+    }
 
 
     return (
@@ -400,11 +432,11 @@ const GameFilesUpload = React.memo(() => {
             </div>
 
             <div className="text-center">
-                <h2 className="text-[40px] font-medium text-black font-sono mt-15">
+                <h2 className="text-[40px] font-medium text-black  mt-15">
                     Go through the steps to publish or save draft for later
                 </h2>
 
-                <p className="text-[24px] font-normal text-[#6F6F6F] text-center font-sono mt-5">
+                <p className="text-[24px] font-normal text-[#6F6F6F] text-center  mt-5">
                     To go back, click on previous step
                 </p>
 
@@ -451,21 +483,42 @@ const GameFilesUpload = React.memo(() => {
             </div>
 
             <div className={`flex  ${selectedFolder ? "justify-between" : "justify-end"} items-center `}>
+                <div className="flex gap-7 items-center ">
                 {
                     selectedFolder && (
-                        <button className="border border-[#A8A8A8] px-2 py-1 rounded-[10px]  text-balck] font-semibold flex items-center gap-2 cursor-pointer" onClick={() => setSelectedFolder(null)}>
+                        <button className="border border-[#A8A8A8] px-2 py-1 rounded-[10px]  text-balck] font-semibold flex items-center gap-2 cursor-pointer" onClick={handleRootFolder}>
                             <MoveLeft className="w-4 h-4  " />
                             Go Back
                         </button>
                     )
                 }
+ <div className="text-sm text-gray-600" aria-label="Breadcrumb">
+              <ol className="flex items-center space-x-1 md:space-x-3">
+                {menuItems.length > 0 && menuItems?.map((item, index) => {
+                  
+                  return (
+                    <li key={item?.id} className="inline-flex items-center cursor-pointer"     onClick={() => handleBreadcrumbClick(index)}>
+                      {index !== 0 && (
+                        <ChevronRight className="w-4 h-4 mx-1 text-gray-400" />
+                      )}
+                      <span
+
+                      >
+                        {item?.name}
+                      </span>
+                    </li>
+                  )
+                })}
+              </ol>
+            </div>
+                </div>
 
                 {activeStep !== 3 && <div className="flex justify-end items-center mb-4 relative">
 
                     {/* {
     selectedFolder?"": <div
       className="bg-white flex items-center gap-[10px] p-4 rounded-[10px] mb-5 cursor-pointer"
-      onClick={() => setShowPopup(true)}
+      onClick={() => setGameShowPopup(true)}
     >
       <span className="text-[#00B290]">Cretate Folder</span>
       <Plus className="w-4 h-4 text-white p-0 bg-[#00B290] rounded-full" />
@@ -487,7 +540,7 @@ const GameFilesUpload = React.memo(() => {
 } */}
                     <div
                         className="bg-white flex items-center gap-[10px] p-4 rounded-[10px] mb-5 cursor-pointer"
-                        onClick={() => {setShowPopup(true);  setShowStudioModal("folder")}}
+                        onClick={() => {setGameShowPopup(true);  setShowStudioModal("folder")}}
                     >
                         <span className="text-[#00B290]">Create Folder</span>
                         <Plus className="w-4 h-4 text-white p-0 bg-[#00B290] rounded-full" />
@@ -612,7 +665,7 @@ const GameFilesUpload = React.memo(() => {
            */}
 
             <div className="mt-6 w-full">
-                <GameFolderCard selectedFoldersPre={selectedFoldersPre} setSelectedFoldersPre={setSelectedFoldersPre} type={rootLevels?.[activeStep]?.id} uploadedFolders={uploadedFolders} addNewFolder={addNewFolder} showPopup={showPopup} setShowPopup={setShowPopup} handleInput={handleInput} fetchFolders={fetchFolders} handleFileChange={handleFileChange} selectedFolder={selectedFolder} setSelectedFolder={setSelectedFolder} gameId={param.id} files={files} folders={folders} onSelectionChange={handleSelectionChange} subFolderFile={subFolderFile} activeStep={activeStep} showStudioModal={showStudioModal} setShowStudioModal={setShowStudioModal} />
+                <GameFolderCard  selectedFoldersPre={selectedFoldersPre} setSelectedFoldersPre={setSelectedFoldersPre} type={rootLevels?.[activeStep]?.id} uploadedFolders={uploadedFolders} addNewFolder={addNewFolder} gameShowPopup={gameShowPopup} setGameShowPopup={setGameShowPopup} handleInput={handleInput} fetchFolders={fetchFolders} handleFileChange={handleFileChange} selectedFolder={selectedFolder} setSelectedFolder={setSelectedFolder} gameId={param.id} files={files} folders={folders} onSelectionChange={handleSelectionChange} subFolderFile={subFolderFile} activeStep={activeStep} showStudioModal={showStudioModal} setShowStudioModal={setShowStudioModal} preSelected={formData?.companies}  onChange={handleCompanyId} handleSelectedFolder={handleSelectedFolder} loading={loading} setLoading={setLoading}/>
 
                 <div className="flex w-full justify-between gap-2 mt-10 mb-10">
                     <button className="flex-grow bg-[#A8A8A8] text-[#6F6F6F] text-sm font-semibold py-3 px-3 rounded-[10px] cursor-pointer flex justify-center items-center gap-2" onClick={handleSubmit}>

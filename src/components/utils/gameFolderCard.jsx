@@ -4,10 +4,11 @@ import folderImg from "../../assets/adminAssets/folder.png";
 import InputField from "./InputFields";
 import apiHandler from "../../functions/apiHandler";
 import StudioDropdown from "./studio";
+import MiniLoader from "./miniLoader";
 
-const GameFolderCard = React.memo(({ options, addExclusivity, setAddExclusivity, setSelectedFoldersPre, selectedFoldersPre, type, subFolderFile, handleFileChange, onSelectionChange, selectedFolder, folders, setSelectedFolder, gameId, files, fetchFolders, setShowPopup, showPopup, addNewFolder, handleInput, uploadedFolders, activeStep,showStudioModal, setShowStudioModal }) => {
+const GameFolderCard = React.memo(({options, addExclusivity, setAddExclusivity, setSelectedFoldersPre, selectedFoldersPre, type, subFolderFile, handleFileChange, onSelectionChange, selectedFolder, folders, setSelectedFolder, gameId, files, fetchFolders, setGameShowPopup, gameShowPopup, addNewFolder, handleInput, uploadedFolders, activeStep,showStudioModal, setShowStudioModal,preSelected, onChange,handleSelectedFolder,loading,setLoading}) => {
   const [open, setOpen] = useState(false)
-  const [menuItems, setMenuItems] = useState([])
+console.log(selectedFolder);
 
   const [companyList, setCompanyList] = useState([])
   const fetchCompany = async () => {
@@ -52,7 +53,6 @@ const GameFolderCard = React.memo(({ options, addExclusivity, setAddExclusivity,
   const toggleFolderSelection = (item, type) => {
     const key = type === "folder" ? "folderId" : "fileId";
     // console.log(item);
-
     const exists = selectedFoldersPre.some((entry) => entry[key] === item.id);
 
     const updated = exists
@@ -67,10 +67,8 @@ const GameFolderCard = React.memo(({ options, addExclusivity, setAddExclusivity,
   // console.log(selectedFoldersPre);
 
 
-  const handleSelectedFolder = (folder) => {
-    setSelectedFolder(folder)
-    // setMenuItems(prevItems => [...prevItems, folder?.name]);
-  }
+
+
 
   const file = uploadedFolders.length > 0 ? uploadedFolders : files;
   const [regionBasedFolders, setRegionBasedFolders] = useState([])
@@ -96,13 +94,14 @@ const GameFolderCard = React.memo(({ options, addExclusivity, setAddExclusivity,
 
   }, [folders, activeStep])
 
-  const handleModal = (type) => {
-    setShowPopup(!showPopup)
+  const handleModal = (type,folder) => {
+    setGameShowPopup(!gameShowPopup)
     setShowStudioModal(type)
+// console.log(folder);
 
   }
 
-console.log(type);
+// console.log(folders);
 
   return (
 
@@ -110,24 +109,26 @@ console.log(type);
       {
         selectedFolder ?
           <div>
-            <div className="text-sm text-gray-600 mt-8" aria-label="Breadcrumb">
+            {/* <div className="text-sm text-gray-600 mt-8" aria-label="Breadcrumb">
               <ol className="flex items-center space-x-1 md:space-x-3">
                 {menuItems.length > 0 && menuItems?.map((item, index) => {
+                  console.log(item);
+                  
                   return (
-                    <li key={index} className="inline-flex items-center cursor-pointer">
+                    <li key={item?.id} className="inline-flex items-center cursor-pointer"     onClick={() => handleBreadcrumbClick(index)}>
                       {index !== 0 && (
                         <ChevronRight className="w-4 h-4 mx-1 text-gray-400" />
                       )}
                       <span
 
                       >
-                        {item}
+                        {item?.name}
                       </span>
                     </li>
                   )
                 })}
               </ol>
-            </div>
+            </div> */}
 
             <>
 
@@ -146,9 +147,9 @@ console.log(type);
                 checked:after:flex checked:after:justify-center checked:after:items-center"
                     />
 
-                    <span className="hover:text-[#00B290] absolute top-5 cursor-pointer right-4 bg-[#393939] text-white text-[15px] font-[600] px-3 py-1 rounded-[10px] flex items-center justify-around gap-2">
+                    <button  disabled={preSelected?.length>0} className="hover:text-[#00B290] disabled:opacity-50 disabled:hover:text-white absolute top-5 cursor-pointer right-4 bg-[#393939] text-white text-[15px] font-[600] px-3 py-1 rounded-[10px] flex items-center justify-around gap-2">
                       Company <SquareArrowOutUpRight size={18} />
-                    </span>
+                    </button>
 
                     <div className="flex flex-col items-center w-full cursor-pointer" onClick={() => {
                       handleSelectedFolder(folder)
@@ -278,8 +279,13 @@ console.log(type);
 
 
 
-          <div className=" bg-white font-sans">
+          <div className=" bg-white font-sans relative">
+               {loading && <MiniLoader  />}
+             {
+              preSelected?.length>0&&<p className="text-center font-bold p-5 text-xl ">Permissions Already Selected</p>
+             }
             <div className="  mt-10">
+            {/* {folders && <MiniLoader  size={24} />} */}
               {regionBasedFolders?.length > 0 ? 
                 <div>
                   {
@@ -293,7 +299,7 @@ console.log(type);
                             <div className="flex  items-center">
                               {/* <div
                                 className="bg-white flex items-center gap-[10px] p-4 rounded-[10px] mb-5 cursor-pointer"
-                                onClick={() => setShowPopup(true)}
+                                onClick={() => setGameShowPopup(true)}
                               >
                                 <span className="text-[#00B290]">Cretate Folder</span>
                                 <Plus className="w-4 h-4 text-white p-0 bg-[#00B290] rounded-full" />
@@ -322,10 +328,10 @@ console.log(type);
                 checked:after:content-['✓'] checked:after:text-white checked:after:text-sm checked:after:font-bold
                 checked:after:flex checked:after:justify-center checked:after:items-center"
                                     />
-
-                                    <span onClick={() => handleModal("company")} className="hover:text-[#00B290] absolute top-5 cursor-pointer right-4 bg-[#393939] text-white text-[15px] font-[600] px-3 py-1 rounded-[10px] flex items-center justify-around gap-2">
+                                    {/* certificate btn */}
+                                    <button disabled={preSelected?.length>0}  onClick={() => handleModal("company")} className="hover:text-[#00B290] disabled:opacity-50 disabled:hover:text-white absolute top-5 cursor-pointer right-4 bg-[#393939] text-white text-[15px] font-[600] px-3 py-1 rounded-[10px] flex items-center justify-around gap-2">
                                       Company <SquareArrowOutUpRight size={18} />
-                                    </span>
+                                    </button>
 
                                     <div className="flex flex-col items-center w-full cursor-pointer" onClick={() => {
                                       handleSelectedFolder(folder)
@@ -335,23 +341,10 @@ console.log(type);
                                         {folder?.name}
                                       </span>
 
-                                      {/* {!folder.loading && (
-                <div className="mt-2 text-sm text-green-600 font-semibold">Uploaded</div>
-              )} */}
+                                    
                                     </div>
 
-                                    {/* {folder.loading && (
-              <div className="absolute inset-0 bg-white/70 backdrop-blur-sm z-10 flex items-center justify-center rounded-[20px]">
-                <div className="relative">
-                  <div className="w-16 h-16 border-4 border-t-[#00B290] border-b-[#00B290] border-l-transparent border-r-transparent rounded-full animate-spin"></div>
-                  <div className="absolute inset-0 flex items-center justify-center text-[#00B290] font-semibold text-[10px] text-center leading-tight px-2">
-                    <div>
-                      {folder.uploaded} <br /> / {folder.total}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )} */}
+                                  
                                   </div>
                                 )
                               })
@@ -386,6 +379,8 @@ console.log(type);
                 :
 
                <div className=" grid grid-cols-4 gap-10 mt-10">
+             
+                 {/* {folders && <MiniLoader  size={24}/>} */}
                   {
                     folders
                       ?.map((folder, index) => (
@@ -402,9 +397,10 @@ console.log(type);
                 checked:after:flex checked:after:justify-center checked:after:items-center"
                           />
 
-                          <span onClick={() => handleModal("company")} className="hover:text-[#00B290] absolute top-5 cursor-pointer right-4 bg-[#393939] text-white text-[15px] font-[600] px-3 py-1 rounded-[10px] flex items-center justify-around gap-2">
-                            Company <SquareArrowOutUpRight size={18} />
-                          </span>
+                          <button disabled={preSelected?.length>0} onClick={() => handleModal("company",folder?.id)} className="hover:text-[#00B290] disabled:opacity-50 disabled:hover:text-white absolute top-5 cursor-pointer right-4 bg-[#393939] text-white text-[15px] font-[600] px-3 py-1 rounded-[10px] flex items-center justify-around gap-2">
+                            {/* folder btn */}
+                            Company<SquareArrowOutUpRight size={18} />
+                          </button>
 
                           <div className="flex flex-col items-center w-full cursor-pointer" onClick={() => {
                             handleSelectedFolder(folder)
@@ -449,11 +445,11 @@ console.log(type);
                 checked:after:flex checked:after:justify-center checked:after:items-center"
                     />
 
-                    <span onClick={() => {
-                      debugger
-                      setShowStudioModal("company")}} className="hover:text-[#00B290] absolute top-5 cursor-pointer right-4 bg-[#393939] text-white text-[15px] font-[600] px-3 py-1 rounded-[10px] flex items-center justify-around gap-2">
+                    <button   disabled={preSelected?.length>0} onClick={() => {
+                  
+                      setShowStudioModal("company")}} className="hover:text-[#00B290] absolute disabled:opacity-50 disabled:hover:text-white  top-5 cursor-pointer right-4 bg-[#393939] text-white text-[15px] font-[600] px-3 py-1 rounded-[10px] flex items-center justify-around gap-2">
                       Company <SquareArrowOutUpRight size={18} />
-                    </span>
+                    </button>
 
                     <div className="flex flex-col items-center w-full">
                       <File size={50} />
@@ -562,13 +558,13 @@ console.log(type);
       }
 
 
-      {showPopup && (
+      {gameShowPopup && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
           {showStudioModal === "company" ?
 
             <div
-              className="w-full h-full grid place-items-center"
-            ><StudioDropdown className="w-full" label='Studio' showBtn={false} options={companyList} addExclusivity={showStudioModal} name="companyIds" /></div>
+              className=""
+            ><StudioDropdown handlePermission={handlePermission} className="w-full" label='Studio' showBtn={false} options={companyList} addExclusivity={showStudioModal} name="companyIds" setGameShowPopup={setGameShowPopup} preSelected={preSelected} onChange={onChange}/></div>
             :
             <div
               className="bg-white rounded-[15px] shadow-lg p-6 w-[25%] transform transition-all duration-300 translate-y-10 opacity-0 animate-popup"
@@ -577,12 +573,12 @@ console.log(type);
 
                 <h2 className="text-xl font-semibold mb-4">Create Folder</h2>
 
-                {showStudioModal}
+                {/* {showStudioModal} */}
 
                 <X
                   size={16}
                   className="text-black cursor-pointer hover:text-black"
-                  onClick={() => {setShowPopup(false)}}
+                  onClick={() => {setGameShowPopup(false)}}
                 />
               </div>
               <InputField type='text' placeholder={`Enter Folder Name`} id='folder' handleInputChange={handleInput} />
@@ -591,7 +587,7 @@ console.log(type);
                 <button className="bg-[#00B290] hover:bg-[black] text-white text-sm font-semibold  w-full rounded-[10px] cursor-pointer px-4 py-2" onClick={addNewFolder}>
                   Create Folder
                 </button>
-                <button className="bg-white hover:text-black hover:border-black border w-full rounded-[10px] border-[#A8A8A8] text-gray-700 text-sm font-semibold px-4 py-2  cursor-pointer" onClick={() => setShowPopup(false)}>
+                <button className="bg-white hover:text-black hover:border-black border w-full rounded-[10px] border-[#A8A8A8] text-gray-700 text-sm font-semibold px-4 py-2  cursor-pointer" onClick={() => setGameShowPopup(false)}>
                   Cancel
                 </button>
 
