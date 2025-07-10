@@ -73,7 +73,7 @@ const InputField = ({
             onChange={handleInputChange}
             name={id}
             id={id}
-            className="block w-full bg-transparent p-[0.6rem] border-2 border-gray-200 placeholder:font-light focus:outline-primary-dark rounded-xl text-desc"
+            className="block w-full bg-transparent p-[0.6rem] border-1 border-[#A8A8A8] placeholder:font-light focus:outline-primary-dark rounded-xl text-desc"
           >
             {options?.map((option, key) => {
               
@@ -154,7 +154,7 @@ const InputField = ({
               inputMode={type === "tel" ? "numeric" : undefined}
               accept={type === "file" ? "image/*" : undefined}
               onChange={handleChange}
-              className={`bg-white-v1  accent-primary-dark text-desc bg-transparent leading-0 p-1 sm:p-2 w-full placeholder:font-light placeholder:text-sm focus:outline-none  disabled:bg-gray-200 ${
+              className={`  accent-primary-dark text-desc bg-transparent leading-0 p-1 sm:p-2 w-full placeholder:font-light placeholder:text-sm focus:outline-primary-dark  disabled:bg-gray-200 ${
                 type !== "password" ? "rounded-xl" : "rounded-l-xl"
               }`}
               disabled={isDisable}

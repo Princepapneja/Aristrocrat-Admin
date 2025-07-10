@@ -104,7 +104,7 @@ studioName.toLowerCase().includes(searchTerm.toLowerCase())
       {
         !addExclusivity &&(
            <div
-        className="border-2 border-gray-200 rounded-md p-2 cursor-pointer flex items-center justify-between bg-[#F4F4F4]"
+        className="border-2 border-gray-200 rounded-xl p-2 cursor-pointer flex items-center justify-between bg-[#F4F4F4]"
         onClick={toggleDropdown}
       >
         <span className="text-[#6F6F6F] font-semibold text-base">{label}</span>

@@ -617,7 +617,7 @@ if(loading) {
               <label className="block text-sm font-semibold mb-1 leading-[24px] text-[#000000]">Game Name</label>
               <input
                 type="text"
-                className="w-full rounded-[10px] border-2  border-gray-200 px-4 py-2"
+                className="w-full rounded-xl border-1  border-black-v4 px-4 py-2 focus:outline-primary-dark"
                 onChange={getIpData}
                 name="title"
                 value={formData?.title}
@@ -639,7 +639,7 @@ if(loading) {
             <div className="w-2/4">
               <label className="block mt-6 mb-2 text-sm font-semibold  leading-[24px] text-[#000000]">Game Description Here</label>
               <textarea
-                className="w-full border-[1px] border-gray-300 rounded-[10px] px-4 py-2 min-h-[200px]  text-[#A8A8A8]"
+                className="w-full border-1 border-black-v4 rounded-[10px] px-4 py-2 min-h-[200px]  text-black-v4 focus:outline-primary-dark"
                 placeholder="Enter the Game Key"
                 onChange={getIpData}
                 name="description"
@@ -788,7 +788,7 @@ if(loading) {
           <label className="block  mb-2 text-sm font-semibold  leading-[24px] text-[#000000]">Game Demo Link</label>
           <input
             type="text"
-            className="w-full border border-gray-300 rounded-md px-4 py-2"
+            className="w-full border-1 border-black-v4 rounded-xl px-4 py-2 focus:outline-primary-dark"
             name="demoLink"
             onChange={getIpData}
             value={formData?.demoLink}
@@ -1003,12 +1003,12 @@ if(loading) {
         </div>
       }
       {!direct &&
-        <div className="w-full bg-[#F4F4F4] p-6 rounded-[10px] mt-10">
+        <div className="w-full bg-[#F4F4F4] p-6 rounded-xl mt-10">
 
           <div className="w-full">
             <label className="block text-2xl font-semibold leading-[24px] mt-6 mb-4 ">Game Key</label>
             <textarea
-              className="w-full border-[1px] bg-white border-gray-300  rounded-[10px] text-[#A8A8A8] px-4 py-2 min-h-[150px]"
+              className="w-full border-1 bg-white border-gray-300 focus:outline-primary-dark rounded-[10px] text--black-v4 px-4 py-2 min-h-[150px]"
               placeholder="Game Key Here"
               onChange={getIpData}
               name="gameKey"
@@ -1020,14 +1020,14 @@ if(loading) {
         </div>
       }
       {!direct &&
-        <div className="w-full bg-[#F4F4F4] p-10 rounded-[10px] mt-5 container">
+        <div className="w-full bg-white-v2 p-10 rounded-xl mt-5 container">
           <h2 className="text-2xl font-semibold px-4 leading-[24px] mb-4">Release Date</h2>
 
           <div className="flex items-center p-4 justify-between mb-4 border-b-1 pb-5  border-gray-300 me-19">
             <span className="font-semibold leading-[24px] text-xl text-[#6F6F6F]">General</span>
             <input
               type="date"
-              className="border border-gray-300 rounded-[10px] px-2 py-1 bg-[#00B290] text-white hover:bg-[black] custom-date"
+              className="border border-black-v4 rounded-xl px-2 py-1 bg-primary-dark text-white hover:bg-[black] custom-date"
               value={moment(formData?.releaseDate).format("YYYY-MM-DD")}
               onChange={(e) =>
                 setFormData((prev) => ({
@@ -1045,7 +1045,7 @@ if(loading) {
             <div key={index} className="flex items-center justify-between gap-1 p-4">
               <div className="relative w-3/4   rounded-[10px] ">
                 <select
-                  className="appearance-none text-base font-semibold w-full bg-[#FAFAFA] border border-gray-300 text-black py-2 px-4 pr-10 rounded-[10px] focus:outline-none"
+                  className="appearance-none text-base font-semibold w-full bg-[#FAFAFA] border border-black-v4 text-black py-2 px-4 pr-10 rounded-[10px] focus:outline-none"
                   value={item.id}
                   onChange={(e) => handleChange(index, "id", e.target.value)}
                 >

@@ -14,7 +14,16 @@
     --color-black-v4: #A8A8A8;
     --color-black-v5: #EAEAEA;
     --font-lexend: 'Lexend', sans-serif;
+     --radius-1xl: 10px;
+     --border-color:#A8A8A8
+
+
   }
+
+  .rounded-1xl {
+  border-radius: var( --radius-1xl);
+}
+
   
   .primary-gradient{
     background : linear-gradient(to right, #66FFCC, #94FF80);
