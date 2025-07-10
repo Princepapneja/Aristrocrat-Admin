@@ -10,7 +10,7 @@ import { Send } from 'lucide-react';
 import { Pen } from 'lucide-react';
 import { MoveRight } from 'lucide-react';
 import { ChevronUp } from "lucide-react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import apiHandler from "../../functions/apiHandler";
 import useGlobal from "../../hooks/useGlobal";
 import { dateFormat } from "../../functions/dateFormat";
@@ -24,6 +24,7 @@ import MiniLoader from "../utils/miniLoader";
 const GameForm = () => {
   const location = useLocation();
   // console.log(location);
+  const [state,setState]= useSearchParams()
 
   const searchParams = new URLSearchParams(location.search);
   // console.log(searchParams);
@@ -51,6 +52,8 @@ const [loading, setLoading] = useState(false);
   const [dates, setDates] = useState([
     { id: "", date: "" },
   ]);
+
+
 
   const handleChange = (index, field, value) => {
     const updatedDates = [...dates];
@@ -204,7 +207,6 @@ const fetchGame = async () => {
         ? moment(country.GameCountryRelease.date).format("YYYY-MM-DD")
         : "",
     }));
-debugger
     setFormData({
       ...game,
       categoryIds: game?.categories?.map((e) => e.id),
@@ -224,9 +226,11 @@ debugger
     fetchTypes()
     fetchRegions()
     fetchCompany()
-    fetchGame()
-  }, [])
 
+  }, [])
+useEffect(()=>{
+    fetchGame()
+},[state])
 
 
 const getIpData = (e, index) => {
@@ -373,6 +377,9 @@ const handleFileUpload = (e) => {
     }));
   }
 };
+
+console.log(formData);
+
   const handleNextClick = async (e) => {
     e.preventDefault();
     try {
@@ -392,11 +399,11 @@ const handleFileUpload = (e) => {
   };
 
 
+
   const handleSubmit = async (e, status) => {
     e.preventDefault();
     setLoading(true);
     const { rtp, rtpUsa } = buildFinalRtpData();
-
     try {
       // 1. Prepare initial payload
       const basePayload = {
@@ -406,6 +413,8 @@ const handleFileUpload = (e) => {
         logo: typeof formData?.logo === "string" ? formData.logo : "",
         thumbnail: typeof formData?.thumbnail === "string" ? formData.thumbnail : "",
         portrait: typeof formData?.portrait === "string" ? formData.portrait : "",
+        // screenshots: formData?.screenshots || []
+
       };
   
       // 2. Create or Update the game
@@ -420,18 +429,28 @@ const handleFileUpload = (e) => {
   
       // 3. Upload images if needed
       const imageFields = ['logo', 'thumbnail', 'portrait'];
-      const uploadedImages = {};
+      const uploadedImages = {
+        screenshots:[]
+      };
   
       for (const field of imageFields) {
         const file = formData?.[field];
         if (file && typeof file !== "string") {
-          const uploadedUrl = await handleFiles(file);
+          const uploadedUrl = await handleFiles(file,response?.data?.id);
           if (uploadedUrl) {
             uploadedImages[field] = uploadedUrl;
           }
         }
       }
-  
+  for (const image of (formData?.screenshots || [])) {
+        if (image && typeof image !== "string") {
+          const uploadedUrl = await handleFiles(image,response?.data?.id);
+          if (uploadedUrl) {
+            uploadedImages?.screenshots.push(uploadedUrl)
+          }
+        }
+      }
+     
       // 4. Patch game with uploaded image URLs
       if (Object.keys(uploadedImages).length > 0) {
         await apiHandler.patch(`/game/${gameId || response?.data?.id}`, uploadedImages);
@@ -441,7 +460,10 @@ const handleFileUpload = (e) => {
       success(response?.message || "Saved successfully");
       setFormData(null);
       setGameId(response?.data?.id);
-  
+
+
+      searchParams.set("gameId",response?.data?.id)
+      setState(searchParams)
       return { successData: response.data };
   
     } catch (err) {
@@ -452,7 +474,7 @@ const handleFileUpload = (e) => {
   }
 
   };
-  const handleFiles = async (file) => {
+  const handleFiles = async (file,gameId) => {
     try {
       const gameData = {
         name: file.name,
@@ -1064,7 +1086,7 @@ if(loading) {
                 <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-black">
                   <svg
                     className="w-5 h-5 text-[#A8A8A8]"
-                    fill="currentColor"
+                    fill="currentColor" 
                     viewBox="0 0 20 20"
                   >
                     <path d="M5.25 7.75L10 12.5l4.75-4.75" stroke="currentColor" strokeWidth="1.5" fill="none" />
