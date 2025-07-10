@@ -102,7 +102,7 @@ const handleModal = (type, folder) => {
     const updatedFormData = { ...prev };
 
     if (type === 'file') {
-      updatedFormData.fileId = folder; // or whatever key represents file ID
+      updatedFormData.fileId = folder; 
     } else if (type === 'folder') {
       updatedFormData.folderId = folder;
     }
