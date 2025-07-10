@@ -31,10 +31,7 @@ const Route = () => {
                     path: '/forgot-password',
                     element: <ForgotPassword />
                 },
-                // {
-                //     path: '/sign-up',
-                //     element: <SignUp />
-                // },
+               
                         {
                             path: '/dashboard',
                             element: <DashboardLayout />,
@@ -85,22 +82,7 @@ const Route = () => {
                                   path:"/dashboard/detail-game/:id",
                                   element:<ProtectedRoute><DetailGame /></ProtectedRoute>
                                 },
-                                {
-                                  path:"/dashboard/test",
-                                  element:<ProtectedRoute><FolderUploader /></ProtectedRoute>
-                                },
-                               
-
-                                
                               
-                                // {
-                                //     path: '/dashboard/manage-categories',
-                                //     element: <AllTables  type="categories"/>
-                                // },
-                                // {
-                                //     path: '/dashboard/questions',
-                                //     element:<QuestionSection/>
-                                // }
                             ]
                         },
                 

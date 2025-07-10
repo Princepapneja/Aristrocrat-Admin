@@ -6,6 +6,7 @@ import { Link, useNavigate } from "react-router-dom"
 import { ToastContainer, toast, Bounce } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Loader from '../components/utils/loader';
+import apiHandler from '../functions/apiHandler';
 const RootLayout = () => {
   const navigate = useNavigate()
   const [height, setHeight] = useState(0);
@@ -19,6 +20,25 @@ const RootLayout = () => {
   const [user, setUser] = useState(null);
   const [studio, setStudio] = useState(null);
   const [mainLoader, setMainLoader] = useState(false)
+    const [companyList,setCompanyList]=useState([])
+  
+  const fetchCompany = async () => {
+    try {
+      const { data } = await apiHandler.get(`/companies`);
+    //   console.log(data);
+      
+      const newSubstudio = data?.data?.map((e) => {
+        return {
+          name: e?.name,
+          value: e?.id
+        }
+      }) || [];
+      setCompanyList(newSubstudio)
+    } catch (error) {
+      console.error('Failed to fetch games:', error);
+    }
+  };
+
   const success = (msg) => toast.success(msg, {
     position: "top-center",
     autoClose: 5000,
@@ -64,6 +84,9 @@ const RootLayout = () => {
  useEffect(()=>{
   fetchNavHeight()
  },[navElement])
+ useEffect(()=>{
+  fetchCompany()
+ },[])
 
   return (
     <>
@@ -89,7 +112,7 @@ const RootLayout = () => {
         <Loader />
       }
       <main className="">
-        <Outlet context={{ disable, setDisable, availableQuestions, setAvailableQuestions, mainLoader, setMainLoader, user, counts, setCounts, navigate, token, setToken, setUser, render, setRender, height, success, error, progress, setProgress, sideBarOpen, setSideBarOpen,setStudio,studio }} />
+        <Outlet context={{ disable, setDisable,companyList,setCompanyList, availableQuestions, setAvailableQuestions, mainLoader, setMainLoader, user, counts, setCounts, navigate, token, setToken, setUser, render, setRender, height, success, error, progress, setProgress, sideBarOpen, setSideBarOpen,setStudio,studio }} />
       </main>
       {/* <Footer/> */}
     </>

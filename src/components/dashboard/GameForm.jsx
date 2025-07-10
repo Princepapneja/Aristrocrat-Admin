@@ -204,7 +204,7 @@ const fetchGame = async () => {
         ? moment(country.GameCountryRelease.date).format("YYYY-MM-DD")
         : "",
     }));
-debugger
+
     setFormData({
       ...game,
       categoryIds: game?.categories?.map((e) => e.id),

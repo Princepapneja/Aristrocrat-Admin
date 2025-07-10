@@ -13,7 +13,7 @@ import '../../../src/mainStyle.css'
 import { ChevronUp } from "lucide-react";
 import useGlobal from '../../hooks/useGlobal';
 import MiniLoader from '../utils/miniLoader';
-
+let debounce =null
 function GamePage() {
   const [params] = useSearchParams()
   const studio = params.get("studio")
@@ -42,7 +42,10 @@ function GamePage() {
 
 const {success}= useGlobal()
   useEffect(() => {
-    fetchGames();
+    if(debounce) clearTimeout(debounce)
+    debounce= setTimeout(()=>{
+      fetchGames();
+    },300)
   }, [filters]);
 
   useEffect(() => {
@@ -117,21 +120,6 @@ const loadMoreGames = () => {
     setFilters(updatedFilters);
   };
 
-  const clearFilter = (key) => {
-    const updatedFilters = { ...filters };
-    delete updatedFilters[key];
-    updatedFilters.skip = 0;
-    setGames([]);
-    setFilters(updatedFilters);
-  };
-
-
-
-  const clearAllFilters = () => {
-    setGames([]);
-    setFilters({ skip: 0, limit: 16 });
-  };
-
   const navigate = useNavigate()
 
   const handleNavigate = (item) => {
@@ -144,13 +132,8 @@ const loadMoreGames = () => {
   const fetchStudio = async () => {
     try {
       const { data } = await apiHandler.get(`studios`);
-      // //console.log(data);
-
       const newstudio = data?.data || [];
       setStudioName(newstudio)
-      // setGames((prev) => (filters.skip === 0 ? newGames : [...prev, ...newGames]));
-      // setHasMore((filters.skip + filters.limit) < data.data.total);
-      // setTotalGames(data.data.total);
     } catch (error) {
       console.error('Failed to fetch games:', error);
     }
@@ -204,7 +187,8 @@ const loadMoreGames = () => {
           <Buttons className='flex gap-15 justify-between items-center hover:bg-black cursor-pointer rounded-[10px] text-[16px]' onClick={toggleDropdown}>Add New Game <span className='text-lg'> {showDropdown ? <X size={20} /> : <Plus size={20} />}</span></Buttons>
           <div className="flex gap-2 grow items-center rounded-[10px] border-[1px] border-[#A8A8A8] py-2 px-4 ">
             <img className="h-3.5 w-3.5" src="/logos/Search.png" alt="Search" />
-            <input type="text" className="outline-none bg-transparent text-[#A8A8A8] text-[16px]" placeholder="Keyword" />
+            <input type="text" className="outline-none bg-transparent text-[#A8A8A8] text-[16px]" placeholder="Keyword" value={filters?.search} onChange={(e)=>{setFilters((prev)=>({...prev, search: e.target.value}))}}
+ />
           </div>
         </div>
 
@@ -311,7 +295,7 @@ const loadMoreGames = () => {
 
 
       <div className='mt-[50px] flex justify-center'>
-        <button className='cursor-pointer bg-[#00B290] hover:bg-[black] text-white text-sm font-semibold py-3 px-8 rounded-[10px]'  onClick={loadMoreGames}>Load More Game</button>
+        <Buttons className='cursor-pointer bg-[#00B290] hover:bg-[black] text-white text-sm font-semibold py-3 px-8 rounded-[10px]' disabled={games?.length===totalGames}  onClick={loadMoreGames}>Load More Game</Buttons>
       </div>
 
 

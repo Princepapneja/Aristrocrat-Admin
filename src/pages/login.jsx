@@ -78,7 +78,7 @@ const Login = () => {
       //   navigate("/")
       //   return
       // }
-      debugger
+      
       localStorage.setItem("token", data.data.accessToken);
 
 

@@ -12,7 +12,7 @@ const s3Client = new S3Client({
     },
   });
   async function uploadFile(file, relativePath) {
-    debugger
+    
     try {
       const command = new PutObjectCommand({
         Bucket,
