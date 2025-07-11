@@ -4,48 +4,19 @@ import ListingTabel from "../utils/ListingTabel";
 import apiHandler from "../../functions/apiHandler";
 import StudioDropdown from "../utils/studio";
 import { useNavigate } from "react-router-dom";
+import MultiSelect from "../utils/multiselect";
+import useGlobal from "../../hooks/useGlobal";
+let debounce=null
 function AssestsDocs() {
 
 
   const [activeStudio, setActiveStudio] = useState(0);
 
-  const [companyList,setCompanyList]=useState([])
   const [masterList,setMasterList]=useState([])
+  const {companyList}= useGlobal()
   
 const navigate =useNavigate()
-  const fetchCompany = async () => {
-    try {
-      const { data } = await apiHandler.get(`/companies`);
-
-    //   console.log(data);
-      setCompanyList(data.data)
-      
-//       const newSubstudio = data?.data?.map((e) => {
-//         console.log(e);
-        
-//         return {
-//           name: e?.name,
-//           value: e?.id
-//         }
-//       }) || [];
-// // console.log(newSubstudio);
-
-//       setCompanyList([
-//         {
-//           name:"Select Company",
-//           value:""
-//         }
-//         ,
-//         ...newSubstudio
-//       ])
-
-      // setGames((prev) => (filters.skip === 0 ? newGames : [...prev, ...newGames]));
-      // setHasMore((filters.skip + filters.limit) < data.data.total);
-      // setTotalGames(data.data.total);
-    } catch (error) {
-      console.error('Failed to fetch games:', error);
-    }
-  };
+ 
 const fetchMasterList=async ()=>{
   try {
     
@@ -59,7 +30,6 @@ const fetchMasterList=async ()=>{
 }
   
   useEffect(() => {
-    fetchCompany();
     fetchMasterList()
   }, []);
 
@@ -95,14 +65,11 @@ const [loading, setLoading] = useState(false);
 
 const fetchFiles = async () => {
   setLoading(true);
-  debugger
   try {
     const query = new URLSearchParams(filters).toString();
     const { data } = await apiHandler.get(`/games?${query}`);
     console.log(data);
-    
     const newFiles = data?.data?.games || [];
-
     setFiles((prev) => (filters.skip === 0 ? newFiles : [...prev, ...newFiles]));
     setHasMore((filters.skip + filters.limit) < data?.data?.total);
   } catch (error) {
@@ -112,7 +79,13 @@ const fetchFiles = async () => {
   }
 };
 useEffect(() => {
-  fetchFiles();
+  if(debounce){
+    clearTimeout(debounce)
+  }
+  debounce= setTimeout(()=>{
+    fetchFiles();
+
+  },300)
 }, [filters]);
 
 const handleLoadMore = () => {
@@ -142,7 +115,9 @@ const handleLoadMore = () => {
               <>
               <div className="flex gap-6 justify-between items-center mb-6">
         <div className="w-1/4">
-         <StudioDropdown className="w-full" label='Company' showBtn={false} options={companyList}  />
+         <MultiSelect  title={<div className='flex gap-2 items-center text-[#6F6F6F] font-semibold text-base capitalize'>
+                                               <h2>Studios</h2> {filters?.companyIds?.length>0 && <span className="ml-2 bg-[#94FF80] px-2 py-0.5 rounded text-xs text-black">{filters?.companyIds?.length}</span>}
+                                           </div>} selected={filters?.companyIds}  options={companyList} onApply={(name,ids)=>{setFilters((prev)=>({...prev,companyIds:ids}))}} onClear={(name,ids)=>{setFilters((prev)=>({...prev,companyIds:[]}))}}  />
          
         </div>
 
@@ -156,6 +131,8 @@ const handleLoadMore = () => {
             type="text"
             className="outline-none bg-transparent text-[#A8A8A8] text-[16px]"
             placeholder="Keyword"
+            value={filters?.search}
+            onChange={(e)=>{setFilters((prev)=>({...prev,search:e.target.value}))}}
           />
         </div>
       </div>

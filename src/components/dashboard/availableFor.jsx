@@ -12,7 +12,7 @@ setCompanyCount(formData?.companyIds?.length )
         setCompanyCount((prev)=>(prev+1))
     }
 const handleRemoveCompany= (index)=>{
-  debugger
+  
   const companyIds =formData?.companyIds?.filter((q,i)=>i!==index)
   setFormData((prev)=>({...prev,companyIds}))
   setCompanyCount((prev)=>prev-1)

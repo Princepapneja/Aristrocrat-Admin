@@ -23,7 +23,7 @@ export default function FileUpload() {
 
     try {
       const formData = new FormData();
-debugger
+
       // Append all files with the same key 'files'
       files.forEach((file) => {
         formData.append('files', file);

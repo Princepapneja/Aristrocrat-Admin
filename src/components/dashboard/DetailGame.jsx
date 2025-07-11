@@ -53,7 +53,7 @@ function DetailGame() {
         try {
             const { data } = await apiHandler.get(`/game/${id}`);
             setGame(data?.data);
-            debugger
+            
             setVolatility(data?.data?.categories?.filter(q=>q.type==="volatility"))
             setTheme(data?.data?.categories?.filter(q=>q.type==="theme"))
             setFeatures(data?.data?.categories?.filter(q=>q.type==="feature"))
