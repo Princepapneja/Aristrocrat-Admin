@@ -26,7 +26,7 @@ const GameForm = () => {
   // console.log(location);
   const [state,setState]= useSearchParams()
 
-  const searchParams = new URLSearchParams(location.search);
+  const searchParams = new URLSearchParams(state);
   // console.log(searchParams);
   const [gameId, setGameId] = useState(searchParams.get("gameId"))
 
@@ -458,7 +458,7 @@ console.log(formData);
   
       // 5. Final state update
       success(response?.message || "Saved successfully");
-      setFormData(null);
+      setFormData((prev)=>({...prev,...uploadedImages}));
       setGameId(response?.data?.id);
 
 

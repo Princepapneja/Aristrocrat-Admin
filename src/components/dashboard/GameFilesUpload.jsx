@@ -37,6 +37,7 @@ const GameFilesUpload = React.memo(() => {
     const [selectedFoldersPre, setSelectedFoldersPre] = useState([]);
     const [name, setName] = useState("")
     const [gameShowPopup, setGameShowPopup] = useState(false);
+    const [companyList,setCompanyList]=useState([])
     useEffect(() => {
         if (!param.id) return
         dataSetter()
@@ -372,6 +373,10 @@ if(loading) {
     </div>
 }
 
+// console.log(rootLevels);
+
+
+
     return (
         <div className="mt-6">
 
@@ -406,8 +411,11 @@ if(loading) {
             </div>
 
             <div className="flex items-center justify-between mt-15">
-                {rootLevels?.map((label, index) => (
-                    <React.Fragment key={index}>
+                {rootLevels?.map((label, index) => {
+                    
+                    return(
+                    
+                    <React.Fragment key={label?.id}>
                         <div
                             className={`flex items-center  gap-5  cursor-pointer px-2 py-3  w-[250px] ${activeStep === index ? 'bg-[#00B290]' : 'bg-[rgba(148,255,128,0.3)]  hover:text-[#00B290] '} rounded-[31px] `}
                             onClick={() => {setActiveStep(index);setSelectedFolder(null);setMenuItems([])}}
@@ -431,7 +439,7 @@ if(loading) {
                             /></div>
                         )}
                     </React.Fragment>
-                ))}
+                )})}
             </div>
 
             <div className="flex w-full justify-between gap-2 mt-10 mb-10 ">
