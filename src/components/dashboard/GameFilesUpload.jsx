@@ -17,7 +17,7 @@ import MiniLoader from "../utils/miniLoader";
 
 const GameFilesUpload = React.memo(() => {
     const param = useParams();
-    const { error, success } = useGlobal();
+    const { error, success } = useGlobal(); 
     const [activeStep, setActiveStep] = useState(0);
     const [uploadedFolders, setUploadedFolders] = useState([]);
     const [addExclusivity, setAddExclusivity] = useState(false);
