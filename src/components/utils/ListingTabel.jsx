@@ -48,7 +48,7 @@ const ListingTabel = ({ games, handleRowClick,companyList,handleLoadMore ,files}
             {files?.map((game, index) =>(
               <tr
                 key={index}
-                onClick={() => navigate(`/dashboard/games/files/${game?.id}?&studioId=${game?.studioId}`)}
+                onClick={() => navigate(`/dashboard/games/files/${game?.id}?&studioId=${game?.studioId}&name=${game?.studio?.name}`)}
                 className="group cursor-pointer text-xl border-b border-gray-200 transition"
               >
                 <td className="py-5 text-base font-medium text-[#6F6F6F] group-hover:text-black ">

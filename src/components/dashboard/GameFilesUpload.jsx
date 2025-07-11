@@ -113,7 +113,7 @@ const GameFilesUpload = React.memo(() => {
         try {
             let url = `games/${param.id}/folders`
             const { data } = await apiHandler.get(url)
-            console.log(data);
+            //console.log(data);
             setRootLevels(data?.data?.folders || [])
         } catch (error) {
             console.error("Error fetching root levels:", error)
@@ -128,14 +128,14 @@ const GameFilesUpload = React.memo(() => {
             let url = `games/${param.id}/folders`
 
             if (selectedFolder) {
-                console.log(selectedFolder)
+                //console.log(selectedFolder)
                 url += `?folder=${selectedFolder?.id}`
             } else {
                 url += `?folder=${rootLevels?.[activeStep]?.id}`
             }
 
             const { data } = await apiHandler.get(url)
-            // console.log(data)
+            // //console.log(data)
 
             if (selectedFolder) {
                 setSubFolderFile(data?.data?.files)
@@ -243,11 +243,7 @@ const GameFilesUpload = React.memo(() => {
         }
     };
 
-    const handleSelectionChange = (selectedIds) => {
-        // console.log(selectedIds);
 
-        setCompanyIds(selectedIds);
-    };
     const handleCompanyId = (e) => {
 
         const data = [...formData?.companyIds || []]
@@ -259,7 +255,7 @@ const GameFilesUpload = React.memo(() => {
         } else {
             data.push(value)
         }
-        // console.log(data);
+        // //console.log(data);
 
         setFormData((prev => ({ ...prev, companyIds: data })))
     }
@@ -292,7 +288,7 @@ const GameFilesUpload = React.memo(() => {
 
     const [ids,setIds]=useState(null)
 
-    console.log(ids);
+    //console.log(ids);
 
         const editPermission = async (e) => {
 
@@ -314,7 +310,7 @@ const GameFilesUpload = React.memo(() => {
     };
 
 
-console.log(formData);
+//console.log(formData);
 
 
     const addNewFolder = async () => {
@@ -337,7 +333,7 @@ console.log(formData);
         try {
 
             const { data } = await apiHandler.get(`/game/${param?.id}`);
-            console.log(data);
+            //console.log(data);
 
             setFormData({
                 title: data?.data?.title || '',
@@ -373,7 +369,7 @@ if(loading) {
     </div>
 }
 
-// console.log(rootLevels);
+// //console.log(rootLevels);
 
 
 
@@ -641,7 +637,7 @@ if(loading) {
                     <MiniLoader />
                 </div>
                     :
-                    <GameFolderCard editPermission={editPermission} setFormData={setFormData} selectedFoldersPre={selectedFoldersPre} setSelectedFoldersPre={setSelectedFoldersPre} type={rootLevels?.[activeStep]?.id} uploadedFolders={uploadedFolders} addNewFolder={addNewFolder} gameShowPopup={gameShowPopup} setGameShowPopup={setGameShowPopup} handleInput={handleInput} fetchFolders={fetchFolders} handleFileChange={handleFileChange} selectedFolder={selectedFolder} setSelectedFolder={setSelectedFolder} gameId={param.id} files={files} folders={folders} onSelectionChange={handleSelectionChange} subFolderFile={subFolderFile} activeStep={activeStep} showStudioModal={showStudioModal} setShowStudioModal={setShowStudioModal} preSelected={formData?.companies} onChange={handleCompanyId} handleSelectedFolder={handleSelectedFolder} loading={loading} setLoading={setLoading} />
+                    <GameFolderCard editPermission={editPermission} setFormData={setFormData} selectedFoldersPre={selectedFoldersPre} setSelectedFoldersPre={setSelectedFoldersPre} type={rootLevels?.[activeStep]?.id} uploadedFolders={uploadedFolders} addNewFolder={addNewFolder} gameShowPopup={gameShowPopup} setGameShowPopup={setGameShowPopup} handleInput={handleInput} fetchFolders={fetchFolders} handleFileChange={handleFileChange} selectedFolder={selectedFolder} setSelectedFolder={setSelectedFolder} gameId={param.id} files={files} folders={folders}  subFolderFile={subFolderFile} activeStep={activeStep} showStudioModal={showStudioModal} setShowStudioModal={setShowStudioModal} preSelected={formData?.companies} onChange={handleCompanyId} handleSelectedFolder={handleSelectedFolder} loading={loading} setLoading={setLoading} />
                 }
 
 

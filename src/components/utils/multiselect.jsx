@@ -15,7 +15,7 @@ export default function MultiSelect({
   onClear,
   name,
 }) {
-    console.log(options)
+    // console.log(options)
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [selectedItems, setSelectedItems] = useState([]);

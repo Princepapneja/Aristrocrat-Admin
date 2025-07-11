@@ -6,7 +6,7 @@ import apiHandler from "../../functions/apiHandler";
 import StudioDropdown from "./studio";
 import MiniLoader from "./miniLoader";
 
-const GameFolderCard = React.memo(({options, addExclusivity, setAddExclusivity, setSelectedFoldersPre, selectedFoldersPre, type, subFolderFile, handleFileChange, onSelectionChange, selectedFolder, folders, setSelectedFolder, gameId, files, fetchFolders, setGameShowPopup, gameShowPopup, addNewFolder, handleInput, uploadedFolders, activeStep,showStudioModal, setShowStudioModal,preSelected, onChange,handleSelectedFolder,loading,setLoading,setFormData,editPermission}) => {
+const GameFolderCard = React.memo(({options, addExclusivity, setAddExclusivity, setSelectedFoldersPre, selectedFoldersPre, type, subFolderFile, handleFileChange,  selectedFolder, folders, setSelectedFolder, gameId, files, fetchFolders, setGameShowPopup, gameShowPopup, addNewFolder, handleInput, uploadedFolders, activeStep,showStudioModal, setShowStudioModal,preSelected, onChange,handleSelectedFolder,loading,setLoading,setFormData,editPermission}) => {
   const [open, setOpen] = useState(false)
 console.log(selectedFolder);
 
@@ -114,7 +114,7 @@ const handleModal = (type, folder) => {
 
 
 
-// console.log(folders);
+// console.log(preSelected);
 
   return (
 
@@ -341,7 +341,7 @@ const handleModal = (type, folder) => {
                 checked:after:flex checked:after:justify-center checked:after:items-center"
                                     />
                                     {/* certificate btn */}
-                                    <button disabled={preSelected?.length>0}  onClick={() => handleModal("company")} className="hover:text-[#00B290] disabled:opacity-50 disabled:hover:text-white absolute top-5 cursor-pointer right-4 bg-[#393939] text-white text-[15px] font-[600] px-3 py-1 rounded-[10px] flex items-center justify-around gap-2">
+                                    <button disabled={preSelected?.length>0}  onClick={() => handleModal("folder",folder?.id)} className="hover:text-[#00B290] disabled:opacity-50 disabled:hover:text-white absolute top-5 cursor-pointer right-4 bg-[#393939] text-white text-[15px] font-[600] px-3 py-1 rounded-[10px] flex items-center justify-around gap-2">
                                       Company <SquareArrowOutUpRight size={18} />
                                     </button>
 

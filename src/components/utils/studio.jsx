@@ -6,7 +6,7 @@ import InputField from './InputFields';
 
 
 export default function StudioDropdown({ label, showBtn ,preSelected ,options,onChange,name,addExclusivity,createCategory,handleCreate,setGameShowPopup,addBtn=null}) {
-// console.log(preSelected,"preSelected")
+// //console.log(preSelected,"preSelected")
   
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -25,7 +25,7 @@ const handleCheck = (studio) => {
     : [...selected, studio];
 
   setSelected(updatedSelection);
-// console.log(updatedSelection);
+// //console.log(updatedSelection);
 
   if (onChange) {
 
@@ -41,7 +41,7 @@ setSelected(preSelected)
 const handleClearAll = () => {
   setSelected([]);
   setSearchTerm("");
-  setGameShowPopup(false)
+    addExclusivity? setGameShowPopup(false):""
 
   if (onChange) {
     onChange({ target: { name,type:"clearAll", value: [] } });
@@ -60,7 +60,7 @@ const handleClearAll = () => {
 
   const addFilter=()=>{
    setOpen(false)
-   setGameShowPopup(false)
+ addExclusivity? setGameShowPopup(false):""
    addBtn && addBtn.func()
   }
   
@@ -81,12 +81,12 @@ studioName.toLowerCase().includes(searchTerm.toLowerCase())
     }
   },[addExclusivity])
 
-  // console.log(filteredStudios);
+  // //console.log(addExclusivity);
     useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setOpen(false);
-           setGameShowPopup(false)
+          addExclusivity? setGameShowPopup(false):""
       }
     };
 
@@ -139,7 +139,7 @@ studioName.toLowerCase().includes(searchTerm.toLowerCase())
 
           <div className="max-h-48 overflow-y-auto px-3 py-2 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
             {filteredStudios?.map((studio, index) => {
-              // console.log(selected.includes(studio.id),studio,selected ,preSelected,"bv");
+              // //console.log(selected.includes(studio.id),studio,selected ,preSelected,"bv");
               const checked =  selected.includes(studio.id)
               return( 
                  <label key={studio.id} className="flex items-center space-x-2 py-1">

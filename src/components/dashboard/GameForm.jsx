@@ -19,15 +19,16 @@ import AvailableFor from "./availableFor";
 import axios from "axios";
 import Loader from '../utils/miniLoader'
 import MiniLoader from "../utils/miniLoader";
+import MultiSelect from "../utils/multiselect";
 
 
 const GameForm = () => {
   const location = useLocation();
-  // console.log(location);
+  // //console.log(location);
   const [state,setState]= useSearchParams()
 
   const searchParams = new URLSearchParams(state);
-  // console.log(searchParams);
+// console.log(searchParams);
   const [gameId, setGameId] = useState(searchParams.get("gameId"))
 
   const id = searchParams.get("studioId");
@@ -58,7 +59,7 @@ const [loading, setLoading] = useState(false);
   const handleChange = (index, field, value) => {
     const updatedDates = [...dates];
     updatedDates[index][field] = value;
-    //console.log( updatedDates);
+    ////console.log( updatedDates);
     setDates(updatedDates);
     const countryReleaseDates = updatedDates.reduce((acc, item) => {
       if (item.id && item.date) {
@@ -102,7 +103,7 @@ const [loading, setLoading] = useState(false);
   const fetchSubStudios = async () => {
     try {
       const { data } = await apiHandler.get(`sub-studios/${id}`);
-      //console.log(data);
+      ////console.log(data);
 
 
       const newSubstudio = data?.data?.map((e) => {
@@ -111,7 +112,7 @@ const [loading, setLoading] = useState(false);
           id: e?.id
         }
       }) || [];
-      // //console.log(newSubstudio);
+      // ////console.log(newSubstudio);
 
       setSubStudios([
         { name: "Select Studio", id: "", },
@@ -128,7 +129,7 @@ const [loading, setLoading] = useState(false);
   const fetchRegions = async () => {
     try {
       const { data } = await apiHandler.get(`/countries`);
-      //console.log(data);
+      ////console.log(data);
       setCountries(data?.data)
 
 
@@ -143,7 +144,7 @@ const [loading, setLoading] = useState(false);
   const fetchCompany = async () => {
     try {
       const { data } = await apiHandler.get(`/companies`);
-      console.log(data);
+      //console.log(data);
       // setCompanyList(data?.data)
 
  const company = data?.data?.map((e) => {
@@ -152,7 +153,7 @@ const [loading, setLoading] = useState(false);
           id: e?.id
         }
       }) || [];
-      // //console.log(newSubstudio);
+      // ////console.log(newSubstudio);
 
       setCompanyList([
         { name: "Select Company", id: "", },
@@ -193,7 +194,7 @@ const [loading, setLoading] = useState(false);
     }
   };
 
-  // //console.log(formData);
+  // ////console.log(formData);
 const fetchGame = async () => {
   if (!gameId) return;
 
@@ -281,11 +282,11 @@ const [variationInp,setVariationInp]=useState(null)
         ))
     }
 
-// console.log(variationInp);
+// //console.log(variationInp);
 
 
 
-// console.log(extraRows);
+// //console.log(extraRows);
 
 const buildFinalRtpData = () => {
   if (!variationInp || typeof variationInp !== "object") return { rtp: {}, rtpUsa: {} };
@@ -378,18 +379,18 @@ const handleFileUpload = (e) => {
   }
 };
 
-console.log(formData);
+//console.log(formData);
 
   const handleNextClick = async (e) => {
     e.preventDefault();
     try {
       const result = await handleSubmit(e, gameId ? formData?.status : "draft");
-      console.log(result);
+      //console.log(result);
       const data = result?.successData
 
       console.log(data);
       if (data) {
-        navigate(`/dashboard/games/files/${data?.id}?name=publish&studioId=${id}`);
+        navigate(`/dashboard/games/files/${data?.id}?name=${searchParams.get("name")}&studioId=${id}`);
       }
     } catch (error) {
       console.log(error)
@@ -496,7 +497,7 @@ console.log(formData);
 
   const handleCategories = (e, type) => {
 
-// console.log(e);
+// //console.log(e);
 
     if (e.type === "clearAll") {
       setFormData((prev => ({ ...prev, categoryIds: [] })))
@@ -513,14 +514,14 @@ console.log(formData);
     } else {
       data.push(value)
     }
-    console.log(data);
+    //console.log(data);
 
     setFormData((prev => ({ ...prev, categoryIds: data })))
   }
   const [categoryFormData, setCategoryFormData] = useState(null)
 
   const handleCreate = (event) => {
-    console.log(event);
+    //console.log(event);
 
     setCategoryFormData((prev) => {
       return {
@@ -546,7 +547,7 @@ console.log(formData);
     try {
 
       const { data } = await apiHandler.post("/categories", payload)
-      console.log(data);
+      //console.log(data);
       if (data) {
         fetchTypes()
 
@@ -569,7 +570,7 @@ console.log(formData);
       companyIds: isChecked ? [] : null
     }));
   };
-  console.log(formData);
+  //console.log(formData);
 
   const [variationColumns, setVariationColumns] = useState([
     { id: '1', name: 'Variation 1' },
@@ -618,6 +619,14 @@ const removeScreenshot = (indexToRemove) => {
     };
   });
 };
+
+const Platforms=[
+
+  {id:1,title:"Mobile",},
+  {id:2,title:"Computer",},
+  {id:3,title:"Casino",},
+  {id:4,title:"Tab",}
+]
 
 if(loading) {
     return <div className="fixed inset-0 z-50 bg-white/70 backdrop-blur-sm flex items-center justify-center">
@@ -716,8 +725,8 @@ if(loading) {
                 )
               })}
             </div>
-            <div>
-              <div className="w-full mt-12">
+            <div className="grid  gap-6 mt-12 items-center">
+              <div className="w-full ">
                 <input
                   type="file"
                   id={"screenshots"}
@@ -750,7 +759,7 @@ if(loading) {
 
             
 
-             <div className="w-full text-black grid gap-2 mt-5 text-base font-medium rounded-[10px] cursor-pointer overflow-y-auto max-h-40 ">
+             <div className={`w-full text-black  ${formData?.screenshots?.length >0 ?"":"hidden"} text-base font-medium rounded-[10px] cursor-pointer `} >
 
           {
              formData?.screenshots?.length >0 && <div className='flex gap-10'>
@@ -758,13 +767,14 @@ if(loading) {
                         onClick={() => setShowFilterModal(true)}
                         className='cursor-pointer font-semibold text-primary-dark flex gap-3.5 items-center bg-white-v2 rounded-xl px-5 py-2.5'
                     >
-                        <p>View Selected Screenshots</p>
+                        <p>Selected Screenshots</p>
                         <img className='h-4 w-4' src='/logos/filterArrow.png' alt='' />
                     </div>
 
                    
                 </div>
           }   
+ 
 
 
   { showFilterModal && (
@@ -799,8 +809,7 @@ if(loading) {
 
 </div>
 
-
-
+<Studio className="w-full" label="Platforms" options={Platforms} preSelected={formData?.platforms} showBtn={false} onChange={handleCategories} name="platforms" handleCreate={handleCreate} createCategory={createCategory} />
 
             </div>
           </div>}

@@ -37,11 +37,6 @@ const DashboardLayout = () => {
   return (
     <>
       <div className='flex  bg-background'>
-        {/* <SideBar /> */}
-        {user?.systemGeneratedPass &&
-          <ChangePass initialValue={user?.systemGeneratedPass} />
-        }
-
         <div className='  flex-grow' >
           <DashBoardHeader />
 

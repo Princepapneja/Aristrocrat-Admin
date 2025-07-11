@@ -3,7 +3,6 @@ import { Minus ,Check} from "lucide-react";
 import UserImg from '../../assets/adminAssets/Kami Scerri.png'
 
 const UserListingCard = ({ user,handleSubmit }) => {
-  console.log(user);
   
     
   return (
@@ -18,19 +17,19 @@ const UserListingCard = ({ user,handleSubmit }) => {
         <div className="text-sm">
           <div className="mb-1 flex">
             <span className="text-gray-500 w-[80px] font-medium">Name:</span>
-            <span className="text-black font-bold">{user.firstName+" " + user?.lastName}</span>
+            <span className="text-black font-bold">{user?.firstName+" " + user?.lastName}</span>
           </div>
           <div className="mb-1 flex">
             <span className="text-gray-500 w-[80px] font-medium">Company:</span>
             <span className="text-black font-bold">{user?.company?.name}</span>
           </div>
-          {/* <div className="mb-1 flex">
+          <div className="mb-1 flex">
             <span className="text-gray-500 w-[80px] font-medium">Position:</span>
-            <span className="text-black font-bold">{user.position}</span>
-          </div> */}
+            <span className="text-black font-bold">{user?.role}</span>
+          </div>
           <div className="flex">
             <span className="text-gray-500 w-[80px] font-medium">Email:</span>
-            <span className="text-black font-bold">{user.email}</span>
+            <span className="text-black font-bold">{user?.email}</span>
           </div>
         </div>
       </div>
